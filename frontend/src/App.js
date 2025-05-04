@@ -15,6 +15,10 @@ function App() {
       <div style={{ marginTop: '20px' }}>
         {mostrarLogin ? <Login /> : <Registro />}
       </div>
+      
+      <p>¿No tienes una cuenta?
+        <button onClick={() => setMostrarLogin(false)} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>Registrarse aqui</button>
+      </p>
     </div>
   );
 }

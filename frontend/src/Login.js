@@ -23,7 +23,7 @@ function Login() {
           <input
             type="email"
             value={correo}
-            onChange={(e) => setCorreo(e.target.value)}
+            onChange={(e) => setCorreo(e.target.value)} placeholder='Ingrese correo'
             required
           />
         </div>
@@ -32,7 +32,7 @@ function Login() {
           <input
             type="password"
             value={contraseña}
-            onChange={(e) => setContraseña(e.target.value)}
+            onChange={(e) => setContraseña(e.target.value)} placeholder='Ingrese contraseña'
             required
           />
         </div>
