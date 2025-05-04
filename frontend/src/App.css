@@ -1,14 +1,67 @@
+/* Estilos generales para la página */
 .App {
-  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Mantener todo al inicio */
   min-height: 100vh;
-  background-color: linear-gradient(to right, #ff7e5f, #feb47b);; 
-}
-.titulo {
-  text-align: center;
-  margin-top: 40px;
+  background: linear-gradient(to bottom, #003366, #87CEEB); /* Fondo gradiente */
+  padding-top: 0; /* Elimina cualquier espaciado en la parte superior */
 }
 
+.titulo-container {
+  text-align: center;
+  margin-top: 0; /* Asegura que el título esté pegado arriba */
+  padding-top: 20px; /* Le damos un pequeño margen superior */
+}
+
+.titulo {
+  font-size: 2.5rem;
+  color: white;
+  font-weight: bold;
+  margin: 0; /* Elimina márgenes adicionales del título */
+}
+
+/* Botones centrados */
+.botones-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+button {
+  background-color: #008cba; /* Azul */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin: 5px;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #005f6b; /* Efecto hover */
+}
+
+/* Estilos para el formulario de login o registro */
+.formulario-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Estilos para el pie de página */
+.p-container {
+  margin-top: 30px;
+}
+
+.p-container p {
+  font-size: 1rem;
+}
+
+.p-container button {
+  background: none;
+  border: none;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
