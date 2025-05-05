@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import {useNavigate} from 'react-router';
+import Registro from './Registro.js';
 
 function Login() {
   const [correo, setCorreo] = useState('');
   const [contraseña, setContraseña] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,6 +40,13 @@ function Login() {
           />
         </div>
         <button type="submit">Iniciar sesión</button>
+
+        
+      <div className="registro-container">
+        <p>¿No tienes una cuenta? 
+          <button onClick={() => navigate('/Registro')} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>Registrarse aquí</button>
+        </p>
+      </div>
       </form>
     </div>
   );

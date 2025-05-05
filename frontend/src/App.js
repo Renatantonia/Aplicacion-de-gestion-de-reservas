@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import Login from './Login';
 import Registro from './Registro';
 import './App.css';
@@ -28,17 +29,13 @@ function App() {
       </div>
       */}
       {/* Mostrar el formulario dependiendo de la opción */}
-      <div className="formulario-container" style={{ marginTop: '20px' }}>
-      {mostrarLogin ? <Login /> : <Registro volverAlLogin={() => setMostrarLogin(true)} />}
-
-      </div>
-
+      <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
+      </Routes>
+    </Router>
       {/* Pie de página */}
-      <div className="p-container">
-        <p>¿No tienes una cuenta? 
-          <button onClick={() => setMostrarLogin(false)} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>Registrarse aquí</button>
-        </p>
-      </div>
     </div>
   );
 }
