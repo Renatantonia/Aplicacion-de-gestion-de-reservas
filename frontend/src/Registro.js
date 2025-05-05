@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import {useNavigate} from 'react-router';
 
-function Registro({ volverAlLogin }) {
+function Registro() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
+  const navigate = useNavigate();
 
   const manejarRegistro = async (e) => {
     e.preventDefault();
@@ -22,7 +24,7 @@ function Registro({ volverAlLogin }) {
       {/* Botón flecha para volver */}
       <button
         type="button"
-        onClick={volverAlLogin}
+        onClick={ () => navigate(-1)}
         style={{
           fontSize: '16px',
           padding: '8px 16px',

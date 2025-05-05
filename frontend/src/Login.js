@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {useNavigate} from 'react-router';
-import Registro from './Registro.js';
 
 function Login() {
   const [correo, setCorreo] = useState('');
