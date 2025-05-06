@@ -29,12 +29,14 @@ function App() {
       </div>
       */}
       {/* Mostrar el formulario dependiendo de la opción */}
-      <Router>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/registro" element={<Registro />} />
-      </Routes>
-    </Router>
+      <div className="formulario-container" style={{ marginTop: '20px' }}>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/registro" element={<Registro />} />
+          </Routes>
+        </Router>
+      </div>
       {/* Pie de página */}
     </div>
   );
