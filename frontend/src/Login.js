@@ -17,7 +17,7 @@ function Login() {
   };
 
   return (
-    <div>
+    <div >
       <h2>Iniciar Sesión</h2>
       <form onSubmit={handleSubmit}>
         <div>
@@ -41,7 +41,7 @@ function Login() {
         <button type="submit">Iniciar sesión</button>
 
         
-      <div className="registro-container">
+      <div className="registro-container" style={{ marginTop: '30px' }}>
         <p>¿No tienes una cuenta? 
           <button onClick={() => navigate('/Registro')} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>Registrarse aquí</button>
         </p>
