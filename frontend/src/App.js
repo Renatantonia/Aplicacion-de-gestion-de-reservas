@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import Login from './Login';
 import Registro from './Registro';
@@ -13,7 +12,6 @@ function Titulo() {
 }
 
 function App() {
-  const [mostrarLogin, setMostrarLogin] = useState(true);
 
   return (
     <div className="App">

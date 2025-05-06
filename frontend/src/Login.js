@@ -17,10 +17,15 @@ function Login() {
   };
 
   return (
-    <div >
+    <div style={{
+      width: '450px',
+      height: '500px',
+      backgroundColor: 'white',
+      border: '8px solid black',
+      borderRadius: '50px'}}>
       <h2>Iniciar Sesión</h2>
       <form onSubmit={handleSubmit}>
-        <div>
+        <div style = {{ marginTop: '50px'}} >
           <label>Correo:</label>
           <input
             type="email"
@@ -29,7 +34,7 @@ function Login() {
             required
           />
         </div>
-        <div>
+        <div style = {{ marginTop: '60px'}}>
           <label>Contraseña:</label>
           <input
             type="password"
@@ -38,7 +43,7 @@ function Login() {
             required
           />
         </div>
-        <button type="submit">Iniciar sesión</button>
+        <button type="submit" style = {{ marginTop: '50px'}}>Iniciar sesión</button>
 
         
       <div className="registro-container" style={{ marginTop: '30px' }}>
