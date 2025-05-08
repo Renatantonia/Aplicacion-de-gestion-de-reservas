@@ -4,6 +4,7 @@ import {useNavigate} from 'react-router';
 function Login() {
   const [correo, setCorreo] = useState('');
   const [contraseña, setContraseña] = useState('');
+  const [mostrar, setMostrar] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -37,11 +38,20 @@ function Login() {
         <div style = {{ marginTop: '60px'}}>
           <label>Contraseña:</label>
           <input
-            type="password"
+            type={mostrar ? 'text' : 'password'}
             value={contraseña}
             onChange={(e) => setContraseña(e.target.value)} placeholder='Ingrese contraseña'
             required
           />
+        </div>
+        <div>
+          <label>
+            <input
+              type = "checkbox"
+              checked ={mostrar}
+              onChange ={() => setMostrar(!mostrar)}
+            />Mostrar contraseña
+          </label>
         </div>
         <button type="submit" style = {{ marginTop: '50px'}}>Iniciar sesión</button>
 

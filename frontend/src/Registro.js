@@ -6,6 +6,8 @@ function Registro() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
+  const [mostrar, setMostrar] = useState(false);
+  const [mostrar2, setMostrar2] = useState(false);
   const navigate = useNavigate();
 
   const manejarRegistro = async (e) => {
@@ -50,8 +52,10 @@ function Registro() {
           <h2>Registro</h2>
           <div style={{marginTop: '40px'}}><input value={correo} onChange={(e) => setCorreo(e.target.value)} placeholder="Ingrese correo" /></div>
           <div style={{marginTop: '40px'}}><input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Ingrese nombre de usuario" /></div>
-          <div style={{marginTop: '40px'}}><input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Ingrese contraseña" /></div>
-          <div style={{marginTop: '40px'}}><input value={password2} onChange={(e) => setPassword2(e.target.value)} type="password" placeholder="Confirmar contraseña" /></div>
+          <div style={{marginTop: '40px'}}><input value={password} onChange={(e) => setPassword(e.target.value)} type={mostrar ? 'text' : 'password'} placeholder="Ingrese contraseña" /></div>
+          <div><input type = "checkbox" value = {mostrar} onChange={() => setMostrar(!mostrar)}/>Mostrar contraseña</div>
+          <div style={{marginTop: '40px'}}><input value={password2} onChange={(e) => setPassword2(e.target.value)} type={mostrar2 ? 'text' : 'password'} placeholder="Confirmar contraseña" /></div>
+          <div><input type = "checkbox" value = {mostrar2} onChange={() => setMostrar2(!mostrar2)}/>Mostrar contraseña</div>
           <div style={{marginTop: '40px'}}/><button type="submit">Registrarse</button>
       </div>
     </form>
