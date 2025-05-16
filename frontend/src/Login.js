@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 
 function Login() {
   const [correo, setCorreo] = useState('');
@@ -12,6 +12,7 @@ function Login() {
     // Simulación de login (no real)
     if (correo === 'admin@admin.com' && contraseña === '1234') {
       alert('¡Inicio de sesión exitoso!');
+      navigate('/InicioAdmin');
     } else {
       alert('Credenciales incorrectas');
     }

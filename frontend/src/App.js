@@ -1,6 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import Login from './Login';
 import Registro from './Registro';
+import InicioAdmin from './InicioAdmin';
+import VerReservas from './VerReservas';
+import VerHistorial from './VerHistorial';
+import ReservasGenerales from './ReservasGenerales';
 import './App.css';
 
 function Titulo() {
@@ -32,6 +36,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
+            <Route path="/InicioAdmin" element={<InicioAdmin />} />
+            <Route path="/VerReservas" element={<VerReservas />} />
+            <Route path="/VerHistorial" element={<VerHistorial />} />
+            <Route path="/ReservasGenerales" element={<ReservasGenerales/>} />
           </Routes>
         </Router>
       </div>
