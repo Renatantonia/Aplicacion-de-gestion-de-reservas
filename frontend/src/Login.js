@@ -7,15 +7,25 @@ function Login() {
   const [mostrar, setMostrar] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulación de login (no real)
-    if (correo === 'admin@admin.com' && contraseña === '1234') {
-      alert('¡Inicio de sesión exitoso!');
+
+    const respuesta = await fetch('http://localhost:3001/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ correo, contraseña }),
+    });
+
+    const data = await respuesta.json();
+
+    if (respuesta.ok) {
+      alert(`¡Bienvenido, ${data.usuario.nombre}!`);
+      // Aquí podrías navegar o guardar sesión simulada
     } else {
-      alert('Credenciales incorrectas');
+      alert(data.message || 'Error en el login');
     }
   };
+
 
   return (
     <div style={{

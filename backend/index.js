@@ -1,36 +1,42 @@
 // backend/index.js
 const express = require('express');
 const cors = require('cors');
+const db = require('./db');
 const app = express();
-const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
 
-// Simular usuarios registrados en memoria
-const users = [];
-
-// Ruta para registro
 app.post('/api/register', (req, res) => {
-  const { username, password } = req.body;
-  if (users.find(u => u.username === username)) {
-    return res.status(400).json({ message: 'Usuario ya registrado' });
-  }
-  users.push({ username, password });
-  res.status(201).json({ message: 'Registro exitoso' });
+  const { nombre, correo, contraseña } = req.body;
+  const query = 'INSERT INTO usuarios (nombre, correo, contraseña) VALUES (?, ?, ?)';
+
+  db.query(query, [nombre, correo, contraseña], (err, result) => {
+    if (err) {
+      if (err.code === 'ER_DUP_ENTRY') {
+        return res.status(400).json({ message: 'Correo ya registrado' });
+      }
+      return res.status(500).json({ message: 'Error en el servidor' });
+    }
+    res.status(201).json({ message: 'Registro exitoso' });
+  });
 });
 
-// Ruta para login
 app.post('/api/login', (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(u => u.username === username && u.password === password);
-  if (user) {
-    res.json({ message: 'Login exitoso' });
-  } else {
-    res.status(401).json({ message: 'Credenciales incorrectas' });
-  }
+  const { correo, contraseña } = req.body;
+  const query = 'SELECT * FROM usuarios WHERE correo = ? AND contraseña = ?';
+
+  db.query(query, [correo, contraseña], (err, results) => {
+    if (err) return res.status(500).json({ message: 'Error en el servidor' });
+    if (results.length > 0) {
+      res.json({ message: 'Login exitoso', usuario: results[0] });
+    } else {
+      res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+  });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
+app.listen(3001, () => {
+  console.log('Servidor backend escuchando en http://localhost:3001');
 });
+
