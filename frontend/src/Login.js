@@ -18,9 +18,15 @@ function Login() {
 
     const data = await respuesta.json();
 
-    if (respuesta.ok) {
+     if (respuesta.ok) {
       alert(`¡Bienvenido, ${data.usuario.nombre}!`);
       // Aquí podrías navegar o guardar sesión simulada
+
+      if(data.usuario.rol == 'admin'){
+        alert(data.message || 'Interfaz Admin en implementación...');
+      }else{
+        alert(data.message || 'Interfaz Cliente en implementación...');
+      }
     } else {
       alert(data.message || 'Error en el login');
     }
