@@ -13,15 +13,26 @@ function Registro() {
 
   const manejarRegistro = async (e) => {
     e.preventDefault();
-    const respuesta = await fetch('http://localhost:3000/api/register', {
+
+    if (password !== password2) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
+
+    const respuesta = await fetch('http://localhost:3001/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, password }),
+      body: JSON.stringify({
+        nombre: nombre + " " + apellido, // o puedes enviarlos por separado
+        correo,
+        contraseña: password
+      }),
     });
 
     const data = await respuesta.json();
     alert(data.message);
   };
+
 
   return (
     <form onSubmit={manejarRegistro}>
