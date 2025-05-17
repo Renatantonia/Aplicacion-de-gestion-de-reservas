@@ -21,6 +21,12 @@ function Login() {
     if (respuesta.ok) {
       alert(`¡Bienvenido, ${data.usuario.nombre}!`);
       // Aquí podrías navegar o guardar sesión simulada
+
+      if(data.usuario.rol == 'admin'){
+        navigate('/InicioAdmin');
+      }else{
+        alert(data.message || 'Interfaz Cliente en implementación...');
+      }
     } else {
       alert(data.message || 'Error en el login');
     }
