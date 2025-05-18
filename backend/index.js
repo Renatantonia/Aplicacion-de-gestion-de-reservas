@@ -38,17 +38,33 @@ app.post('/api/login', (req, res) => {
 
 app.get('/api/historial-reservas', (req, res) => {
   const query = `
-    SELECT u.nombre, r.fecha
+    SELECT 
+      u.nombre AS nombre_usuario,
+      r.fecha,
+      r.hora_inicio,
+      r.hora_fin,
+      c.nombre AS nombre_cancha,
+      r.total_pago,
+      e.nombre AS nombre_equipamiento,
+      er.cantidad
     FROM reservas r
     JOIN usuarios u ON r.id_usuario = u.id
-    ORDER BY r.fecha DESC
+    JOIN canchas c ON r.id_cancha = c.id
+    LEFT JOIN equipamiento_reserva er ON r.id = er.id_reserva
+    LEFT JOIN equipamiento e ON er.id_equipamiento = e.id
+    ORDER BY r.fecha DESC, r.hora_inicio;
   `;
 
   db.query(query, (err, results) => {
-    if (err) return res.status(500).json({ message: 'Error en el servidor' });
+    if (err) {
+      console.error('Error en la consulta:', err);
+      return res.status(500).json({ message: 'Error en el servidor' });
+    }
+    
     res.json(results);
   });
 });
+
 
 
 app.listen(3001, () => {
