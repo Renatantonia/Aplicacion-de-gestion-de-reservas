@@ -9,7 +9,7 @@ function VerHistorial (){
             <p>Por favor, seleciona una opción nuevamente:</p>
 
             <button
-                onClick={() => alert('no se ha implementado')}
+                onClick={() => navigate('/VerHistorialReservas')}
                 style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
             > 
                 Ver Historial de Reservas

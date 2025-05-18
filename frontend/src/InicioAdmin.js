@@ -14,7 +14,7 @@ function InicioAdmin(){
                 onClick={() => navigate('/VerReservas')}
                 style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
             >
-                Ver Reservas
+                Editar Reservas
             </button>
 
             <button

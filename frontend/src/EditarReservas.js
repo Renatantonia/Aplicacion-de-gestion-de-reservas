@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {useNavigate} from 'react-router-dom';
 
-function VerReservas (){
+function EditarReservas (){
     const navigate = useNavigate();
 
     return (
@@ -12,14 +12,14 @@ function VerReservas (){
                 onClick={() => navigate('/ReservasGenerales')}
                 style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
             > 
-                Ver Reservas Generales
+                Editar Reservas Generales
             </button>
 
             <button
                 onClick={() => alert('no se ha implementado')}
                 style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
             > 
-                Ver Reservas de Jugador
+                Editar Reservas de Jugador
             </button>
         </div>
 
@@ -27,4 +27,4 @@ function VerReservas (){
 
 }
 
-export default VerReservas;
+export default EditarReservas;

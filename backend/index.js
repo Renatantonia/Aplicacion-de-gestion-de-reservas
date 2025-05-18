@@ -36,7 +36,24 @@ app.post('/api/login', (req, res) => {
   });
 });
 
+app.get('/api/historial-reservas', (req, res) => {
+  const query = `
+    SELECT u.nombre, r.fecha
+    FROM reservas r
+    JOIN usuarios u ON r.id_usuario = u.id
+    ORDER BY r.fecha DESC
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) return res.status(500).json({ message: 'Error en el servidor' });
+    res.json(results);
+  });
+});
+
+
 app.listen(3001, () => {
   console.log('Servidor backend escuchando en http://localhost:3001');
 });
+
+
 

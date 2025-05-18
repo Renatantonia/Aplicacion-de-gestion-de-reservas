@@ -2,9 +2,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import Login from './Login';
 import Registro from './Registro';
 import InicioAdmin from './InicioAdmin';
-import VerReservas from './VerReservas';
+import EditarReservas from './EditarReservas';
 import VerHistorial from './VerHistorial';
 import ReservasGenerales from './ReservasGenerales';
+import VerHistorialReservas from './VerHistorialReservas';
 import './App.css';
 
 function Titulo() {
@@ -37,9 +38,10 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/InicioAdmin" element={<InicioAdmin />} />
-            <Route path="/VerReservas" element={<VerReservas />} />
+            <Route path="/VerReservas" element={<EditarReservas />} />
             <Route path="/VerHistorial" element={<VerHistorial />} />
             <Route path="/ReservasGenerales" element={<ReservasGenerales/>} />
+            <Route path="/VerHistorialReservas" element={<VerHistorialReservas/>} />
           </Routes>
         </Router>
       </div>
