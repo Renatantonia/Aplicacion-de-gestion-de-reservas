@@ -14,7 +14,7 @@ function VerHistorialReservas() {
             .catch((err) => console.error('Error al obtener historial:', err));
     }, []);
 
-    // Aplicar filtro
+    
     const reservasFiltradas = reservas.filter((reserva) => {
         const date = new Date(reserva.fecha);
         const dia = String(date.getDate()).padStart(2, '0');
@@ -30,7 +30,7 @@ function VerHistorialReservas() {
 
     return (
         <div className="contenedor-principal">
-            {/* Cuadro izquierdo: Historial */}
+            
             <div className="background">
                 <h2 className="titulo-historial-reservas">Historial de Reservas</h2>
                 <hr className="separador" />
@@ -61,7 +61,7 @@ function VerHistorialReservas() {
                 </div>
             </div>
 
-            {/* Cuadro derecho: Filtros */}
+            
             <div className="filtro-fecha">
                 <h3>Filtrar por fecha</h3>
                 <div className="filtros">
