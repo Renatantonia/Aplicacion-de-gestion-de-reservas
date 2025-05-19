@@ -6,6 +6,8 @@ import EditarReservas from './EditarReservas';
 import VerHistorial from './VerHistorial';
 import ReservasGenerales from './ReservasGenerales';
 import VerHistorialReservas from './VerHistorialReservas';
+import InicioUsuario from './InicioUsuario';
+import HacerReserva from './HacerReserva';
 import './App.css';
 
 function Titulo() {
@@ -42,6 +44,8 @@ function App() {
             <Route path="/VerHistorial" element={<VerHistorial />} />
             <Route path="/ReservasGenerales" element={<ReservasGenerales/>} />
             <Route path="/VerHistorialReservas" element={<VerHistorialReservas/>} />
+            <Route path="/InicioUsuario" element={<InicioUsuario/>} />
+            <Route path="/HacerReserva" element={<HacerReserva/>} />
           </Routes>
         </Router>
       </div>

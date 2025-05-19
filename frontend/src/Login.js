@@ -25,7 +25,7 @@ function Login() {
       if(data.usuario.rol == 'admin'){
         navigate('/InicioAdmin');
       }else{
-        alert(data.message || 'Interfaz Cliente en implementación...');
+        navigate('/InicioUsuario');
       }
     } else {
       alert(data.message || 'Error en el login');
