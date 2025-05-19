@@ -31,6 +31,13 @@ function InicioUsuario(){
             >
                 Añadir Saldo
             </button>
+
+            <button
+                onClick={() => navigate(-1)}
+                style={{ margin: '10px', padding: '50px 60px', fontSize: '16px'}}
+            >
+                Cerrar sesion
+            </button>
         </div>
     );
 
