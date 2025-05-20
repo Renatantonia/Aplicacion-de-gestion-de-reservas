@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+function InicioUsuario() {
+    const [nombre, setNombre] = useState('');
+    const navigate = useNavigate();
 
-function InicioUsuario(){
-    const navigate = useNavigate ();
-    const nombre = "Hola";
+    useEffect(() => {
+        const nombreGuardado = localStorage.getItem('nombreUsuario');
+        if (nombreGuardado) {
+            setNombre(nombreGuardado);
+        }
+    }, []);
 
     return (
-        <div style = {{ padding: '50px', textAlign: 'center'}}>
-            <h1>Has ingresado como {nombre}</h1>
+        <div style={{ padding: '50px', textAlign: 'center' }}>
+            <h1>Has ingresado como {nombre}!</h1>
             <p>Selecciona una opción:</p>
 
             <button
@@ -27,20 +33,22 @@ function InicioUsuario(){
 
             <button
                 onClick={() => navigate('/AñadirSaldo')}
-                style={{ margin: '10px', padding: '50px 60px', fontSize: '16px'}}
+                style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
             >
                 Añadir Saldo
             </button>
 
             <button
-                onClick={() => navigate(-1)}
-                style={{ margin: '10px', padding: '50px 60px', fontSize: '16px'}}
+                onClick={() => {
+                    localStorage.removeItem('nombreUsuario');
+                    navigate(-1);
+                }}
+                style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
             >
-                Cerrar sesion
+                Cerrar sesión
             </button>
         </div>
     );
-
 }
 
 export default InicioUsuario;
