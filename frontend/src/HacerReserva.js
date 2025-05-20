@@ -12,9 +12,9 @@ function HacerReserva(){
     return(
         <div className='contenedor-hacerReserva'>
             <div className='background'>
-                <p style={{padding: '16px', textAlign: 'left'}}>Hacer reserva</p>
+                <h2 className="titulo-historial-reservas">Hacer reserva</h2>
                 <div className='separador'/>
-                <p style={{padding: '16px', textAlign: 'left'}}>Canchas disponibles:</p>
+                <p style={{padding: '8px', textAlign: 'left'}}>Canchas disponibles:</p>
             </div>
                             <div className="filtro-fecha">
                 <div className="columna-lateral">
