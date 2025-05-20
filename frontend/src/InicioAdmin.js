@@ -23,6 +23,13 @@ function InicioAdmin(){
             >
                 Ver Historial
             </button>
+
+            <button
+                onClick={() => navigate(-1)}
+                style={{ padding: '50px 60px', fontSize: '16px' }}
+            >
+                Cerrar sesión
+            </button>
         </div>
     );
 
