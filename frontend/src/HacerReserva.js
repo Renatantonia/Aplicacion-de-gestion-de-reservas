@@ -1,86 +1,167 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import React, { useState } from 'react';
-import {useNavigate} from 'react-router-dom';
+function HacerReserva() {
+  const navigate = useNavigate();
 
-function HacerReserva(){
-    const navigate = useNavigate();
-    const [filtroDia, setFiltroDia] = useState('');
-    const [filtroMes, setFiltroMes] = useState('');
-    const [filtroAnio, setFiltroAnio] = useState('');
-    const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
+  const [canchas, setCanchas] = useState([]);
+  const [canchaSeleccionada, setCanchaSeleccionada] = useState(null);
 
-    return(
-        <div className='contenedor-hacerReserva'>
-            <div className='background'>
-                <h2 className="titulo-historial-reservas">Hacer reserva</h2>
-                <div className='separador'/>
-                <p style={{padding: '8px', textAlign: 'left'}}>Canchas disponibles:</p>
-            </div>
-                            <div className="filtro-fecha">
-                <div className="columna-lateral">
-                    <div>
-                        <h3>Filtrar por fecha</h3>
-                        <div className="filtros">
-                            <select onChange={(e) => setFiltroDia(e.target.value)}>
-                                <option value="">Día</option>
-                                {[...Array(31)].map((_, i) => {
-                                    const dia = String(i + 1).padStart(2, '0');
-                                    return <option key={dia} value={dia}>{dia}</option>;
-                                })}
-                            </select>
+  const [filtroDia, setFiltroDia] = useState('');
+  const [filtroMes, setFiltroMes] = useState('');
+  const [filtroAnio, setFiltroAnio] = useState('');
+  const [horaInicio, setHoraInicio] = useState('10:00');
+  const [horaFin, setHoraFin] = useState('11:00');
 
-                            <select onChange={(e) => setFiltroMes(e.target.value)}>
-                                <option value="">Mes</option>
-                                {[
-                                    '01', '02', '03', '04', '05', '06',
-                                    '07', '08', '09', '10', '11', '12'
-                                ].map((mes, i) => (
-                                    <option key={mes} value={mes}>
-                                        {new Date(0, i).toLocaleString('es-ES', { month: 'long' })}
-                                    </option>
-                                ))}
-                            </select>
+  const [jugadores, setJugadores] = useState([
+    { nombre: '', apellido: '', rut: '', edad: '' }
+  ]);
 
-                            <select onChange={(e) => setFiltroAnio(e.target.value)}>
-                                <option value="">Año</option>
-                                {[2023, 2024, 2025].map((año) => (
-                                    <option key={año} value={String(año)}>{año}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
+  const id_usuario = localStorage.getItem('id');
+  const [mensaje, setMensaje] = useState('');
 
-                    {reservaSeleccionada && (
-                        <div className="detalle-reserva">
-                            <h4>Detalles de la Reserva</h4>
-                            <p><strong>Nombre:</strong> {reservaSeleccionada.nombre}</p>
-                            <p><strong>Cancha:</strong> {reservaSeleccionada.cancha}</p>
-                            <p><strong>Fecha:</strong> {new Date(reservaSeleccionada.fecha).toLocaleString('es-ES', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                            })}</p>
-                            <p><strong>Hora:</strong> {reservaSeleccionada.hora_inicio} - {reservaSeleccionada.hora_fin}</p>
-                            <p><strong>Total pagado:</strong> ${reservaSeleccionada.total}</p>
-                            <p><strong>Equipamiento:</strong></p>
-                            {reservaSeleccionada.equipamientos.length > 0 ? (
-                                <ul>
-                                    {reservaSeleccionada.equipamientos.map((eq, i) => (
-                                        <li key={i}>{eq.nombre} x{eq.cantidad}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>Sin equipamiento</p>
-                            )}
-                            <button onClick={() => setReservaSeleccionada(null)}>Cerrar</button>
-                        </div>
-                    )}
-                </div>
-            </div>
-            
+  // Cargar canchas desde el backend
+  useEffect(() => {
+    fetch('http://localhost:3001/api/canchas')
+      .then(res => res.json())
+      .then(data => setCanchas(data))
+      .catch(err => console.error('Error al cargar canchas:', err));
+  }, []);
+
+  const agregarJugador = () => {
+    if (!canchaSeleccionada) {
+      alert('Selecciona una cancha primero');
+      return;
+    }
+    if (jugadores.length >= canchaSeleccionada.max_jugadores) {
+      alert(`Máximo ${canchaSeleccionada.max_jugadores} jugadores para esta cancha.`);
+      return;
+    }
+    setJugadores([...jugadores, { nombre: '', apellido: '', rut: '', edad: '' }]);
+  };
+
+  const eliminarJugador = (index) => {
+    setJugadores(jugadores.filter((_, i) => i !== index));
+  };
+
+  const actualizarJugador = (index, campo, valor) => {
+    const copia = [...jugadores];
+    copia[index][campo] = valor;
+    setJugadores(copia);
+  };
+
+  const enviarReserva = async () => {
+    if (!canchaSeleccionada) {
+      alert("Debes seleccionar una cancha");
+      return;
+    }
+
+    if (!filtroDia || !filtroMes || !filtroAnio) {
+      alert("Selecciona una fecha válida.");
+      return;
+    }
+
+    const fecha = `${filtroAnio}-${filtroMes}-${filtroDia}`;
+
+    const reserva = {
+      id_usuario,
+      id_cancha: canchaSeleccionada.id,
+      fecha,
+      hora_inicio: horaInicio,
+      hora_fin: horaFin,
+      total_pago: canchaSeleccionada.costo,
+      jugadores
+    };
+
+    try {
+      const res = await fetch('http://localhost:3001/api/reservas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reserva)
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setMensaje('✅ Reserva registrada con éxito');
+        setJugadores([{ nombre: '', apellido: '', rut: '', edad: '' }]);
+      } else {
+        alert(data.message || 'Error al guardar la reserva');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error al conectar con el servidor');
+    }
+  };
+
+  return (
+    <div className='contenedor-hacerReserva'>
+      <h2>Hacer Reserva</h2>
+
+      <h4>Selecciona una cancha</h4>
+      <select onChange={(e) => {
+        const cancha = canchas.find(c => c.id === parseInt(e.target.value));
+        setCanchaSeleccionada(cancha);
+      }}>
+        <option value="">-- Elige cancha --</option>
+        {canchas.map((cancha) => (
+          <option key={cancha.id} value={cancha.id}>
+            {cancha.nombre} - ${cancha.costo} - Máx {cancha.max_jugadores} jugadores
+          </option>
+        ))}
+      </select>
+
+      <h4>Selecciona fecha</h4>
+      <div className="filtros-fecha">
+        <select onChange={(e) => setFiltroDia(e.target.value)}>
+          <option value="">Día</option>
+          {[...Array(31)].map((_, i) => {
+            const dia = String(i + 1).padStart(2, '0');
+            return <option key={dia} value={dia}>{dia}</option>;
+          })}
+        </select>
+        <select onChange={(e) => setFiltroMes(e.target.value)}>
+          <option value="">Mes</option>
+          {Array.from({ length: 12 }, (_, i) => {
+            const mes = String(i + 1).padStart(2, '0');
+            return (
+              <option key={mes} value={mes}>
+                {new Date(0, i).toLocaleString('es-ES', { month: 'long' })}
+              </option>
+            );
+          })}
+        </select>
+        <select onChange={(e) => setFiltroAnio(e.target.value)}>
+          <option value="">Año</option>
+          {[2024, 2025].map(a => (
+            <option key={a} value={a}>{a}</option>
+          ))}
+        </select>
+      </div>
+
+      <h4>Selecciona horario</h4>
+      <input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} />
+      <input type="time" value={horaFin} onChange={(e) => setHoraFin(e.target.value)} />
+
+      <h4>Jugadores ({jugadores.length})</h4>
+      {jugadores.map((j, i) => (
+        <div key={i} style={{ marginBottom: '10px' }}>
+          <input placeholder="Nombre" value={j.nombre} onChange={e => actualizarJugador(i, 'nombre', e.target.value)} />
+          <input placeholder="Apellido" value={j.apellido} onChange={e => actualizarJugador(i, 'apellido', e.target.value)} />
+          <input placeholder="RUT" value={j.rut} onChange={e => actualizarJugador(i, 'rut', e.target.value)} />
+          <input placeholder="Edad" type="number" value={j.edad} onChange={e => actualizarJugador(i, 'edad', e.target.value)} />
+          <button type="button" onClick={() => eliminarJugador(i)}>Eliminar</button>
         </div>
-    );
+      ))}
+      <button type="button" onClick={agregarJugador}>+ Agregar jugador</button>
 
+      <div style={{ marginTop: '20px' }}>
+        <button onClick={enviarReserva}>Confirmar reserva</button>
+        <button onClick={() => navigate(-1)} style={{ marginLeft: '10px' }}>Cancelar</button>
+      </div>
+
+      {mensaje && <p style={{ color: 'green' }}>{mensaje}</p>}
+    </div>
+  );
 }
 
 export default HacerReserva;
