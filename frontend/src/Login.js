@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [correo, setCorreo] = useState('');
@@ -20,18 +20,22 @@ function Login() {
 
     if (respuesta.ok) {
       alert(`¡Bienvenido, ${data.usuario.nombre}!`);
-      // Aquí podrías navegar o guardar sesión simulada
 
-      if(data.usuario.rol == 'admin'){
+      //  Guardar datos de sesión en localStorage
+      localStorage.setItem('id', data.usuario.id);     // <-- muy importante
+      localStorage.setItem('rol', data.usuario.rol);   // <-- opcional, útil para vistas
+
+      //  Redirigir según el rol
+      if (data.usuario.rol === 'admin') {
         navigate('/InicioAdmin');
-      }else{
+      } else {
         navigate('/InicioUsuario');
       }
+
     } else {
       alert(data.message || 'Error en el login');
     }
   };
-
 
   return (
     <div style={{
@@ -42,7 +46,7 @@ function Login() {
       borderRadius: '50px'}}>
       <h2>Iniciar Sesión</h2>
       <form onSubmit={handleSubmit}>
-        <div style = {{ marginTop: '50px'}} >
+        <div style={{ marginTop: '50px' }}>
           <label>Correo:</label>
           <input
             type="email"
@@ -51,7 +55,7 @@ function Login() {
             required
           />
         </div>
-        <div style = {{ marginTop: '60px'}}>
+        <div style={{ marginTop: '60px' }}>
           <label>Contraseña:</label>
           <input
             type={mostrar ? 'text' : 'password'}
@@ -63,20 +67,19 @@ function Login() {
         <div>
           <label>
             <input
-              type = "checkbox"
-              checked ={mostrar}
-              onChange ={() => setMostrar(!mostrar)}
-            />Mostrar contraseña
+              type="checkbox"
+              checked={mostrar}
+              onChange={() => setMostrar(!mostrar)}
+            /> Mostrar contraseña
           </label>
         </div>
-        <button type="submit" style = {{ marginTop: '50px'}}>Iniciar sesión</button>
+        <button type="submit" style={{ marginTop: '50px' }}>Iniciar sesión</button>
 
-        
-      <div className="registro-container" style={{ marginTop: '30px' }}>
-        <p>¿No tienes una cuenta? 
-          <button onClick={() => navigate('/Registro')} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>Registrarse aquí</button>
-        </p>
-      </div>
+        <div className="registro-container" style={{ marginTop: '30px' }}>
+          <p>¿No tienes una cuenta?
+            <button onClick={() => navigate('/Registro')} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>Registrarse aquí</button>
+          </p>
+        </div>
       </form>
     </div>
   );

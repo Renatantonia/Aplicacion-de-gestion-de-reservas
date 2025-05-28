@@ -82,7 +82,7 @@ function HacerReserva() {
 
       const data = await res.json();
       if (res.ok) {
-        setMensaje('✅ Reserva registrada con éxito');
+        navigate('/ReservaExitosa');
         setJugadores([{ nombre: '', apellido: '', rut: '', edad: '' }]);
       } else {
         alert(data.message || 'Error al guardar la reserva');

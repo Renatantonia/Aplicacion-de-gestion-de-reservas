@@ -64,6 +64,7 @@ app.get('/api/historial-reservas', (req, res) => {
     res.json(results);
   });
 });
+
   // Ruta para registrar reservas con validación de cantidad de jugadores
 app.post('/api/reservas', (req, res) => {
   const {
@@ -80,49 +81,68 @@ app.post('/api/reservas', (req, res) => {
     return res.status(400).json({ message: 'Debe ingresar al menos un jugador' });
   }
 
-  // 1. Obtener el límite de jugadores de la cancha
-  const queryCancha = 'SELECT max_jugadores FROM canchas WHERE id = ?';
-  db.query(queryCancha, [id_cancha], (err, result) => {
-    if (err) return res.status(500).json({ message: 'Error al consultar cancha' });
-    if (result.length === 0) return res.status(404).json({ message: 'Cancha no encontrada' });
+  // 0. Validar que no exista otra reserva que se cruce en horario
+  const queryDisponibilidad = `
+    SELECT * FROM reservas 
+    WHERE id_cancha = ? 
+      AND fecha = ?
+      AND (
+        hora_inicio < ? AND hora_fin > ?
+      )
+  `;
 
-    const capacidad = result[0].max_jugadores;
+  db.query(queryDisponibilidad, [id_cancha, fecha, hora_fin, hora_inicio], (err, reservasExistentes) => {
+    if (err) return res.status(500).json({ message: 'Error al verificar disponibilidad' });
 
-    if (jugadores.length > capacidad) {
-      return res.status(400).json({ message: `La cancha permite un máximo de ${capacidad} jugadores` });
+    if (reservasExistentes.length > 0) {
+      return res.status(409).json({ message: 'La cancha ya está reservada en ese horario' });
     }
 
-    // 2. Insertar la reserva
-    const queryReserva = `
-      INSERT INTO reservas (id_usuario, id_cancha, fecha, hora_inicio, hora_fin, total_pago)
-      VALUES (?, ?, ?, ?, ?, ?)`;
+    // 1. Obtener el límite de jugadores de la cancha
+    const queryCancha = 'SELECT max_jugadores FROM canchas WHERE id = ?';
+    db.query(queryCancha, [id_cancha], (err, result) => {
+      if (err) return res.status(500).json({ message: 'Error al consultar cancha' });
+      if (result.length === 0) return res.status(404).json({ message: 'Cancha no encontrada' });
 
-    db.query(queryReserva, [id_usuario, id_cancha, fecha, hora_inicio, hora_fin, total_pago], (err, resultReserva) => {
-      if (err) return res.status(500).json({ message: 'Error al registrar la reserva' });
+      const capacidad = result[0].max_jugadores;
 
-      const id_reserva = resultReserva.insertId;
+      if (jugadores.length > capacidad) {
+        return res.status(400).json({ message: `La cancha permite un máximo de ${capacidad} jugadores` });
+      }
 
-      // 3. Insertar los jugadores asociados
-      const queryJugadores = `
-        INSERT INTO jugadores_reserva (id_reserva, nombre, apellido, rut, edad)
-        VALUES ?`;
+      // 2. Insertar la reserva
+      const queryReserva = `
+        INSERT INTO reservas (id_usuario, id_cancha, fecha, hora_inicio, hora_fin, total_pago)
+        VALUES (?, ?, ?, ?, ?, ?)`;
 
-      const datosJugadores = jugadores.map(j => [
-        id_reserva,
-        j.nombre,
-        j.apellido,
-        j.rut,
-        j.edad
-      ]);
+      db.query(queryReserva, [id_usuario, id_cancha, fecha, hora_inicio, hora_fin, total_pago], (err, resultReserva) => {
+        if (err) return res.status(500).json({ message: 'Error al registrar la reserva' });
 
-      db.query(queryJugadores, [datosJugadores], (err) => {
-        if (err) return res.status(500).json({ message: 'Reserva registrada, pero error al guardar jugadores' });
+        const id_reserva = resultReserva.insertId;
 
-        res.status(201).json({ message: 'Reserva y jugadores registrados exitosamente' });
+        // 3. Insertar los jugadores asociados
+        const queryJugadores = `
+          INSERT INTO jugadores_reserva (id_reserva, nombre, apellido, rut, edad)
+          VALUES ?`;
+
+        const datosJugadores = jugadores.map(j => [
+          id_reserva,
+          j.nombre,
+          j.apellido,
+          j.rut,
+          j.edad
+        ]);
+
+        db.query(queryJugadores, [datosJugadores], (err) => {
+          if (err) return res.status(500).json({ message: 'Reserva registrada, pero error al guardar jugadores' });
+
+          res.status(201).json({ message: 'Reserva y jugadores registrados exitosamente' });
+        });
       });
     });
   });
 });
+
 
 app.get('/api/canchas', (req, res) => {
   const query = 'SELECT id, nombre, costo, max_jugadores FROM canchas';
