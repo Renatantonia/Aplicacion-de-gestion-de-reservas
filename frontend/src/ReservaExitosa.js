@@ -9,7 +9,7 @@ function ReservaExitosa() {
       textAlign: 'center',
       marginTop: '100px'
     }}>
-      <h2 style={{ color: 'green' }}>✅ ¡Reserva registrada con éxito!</h2>
+      <h2 style={{ color: 'green' }}>¡Reserva registrada con éxito!</h2>
       <p>Gracias por usar el sistema de reservas de UCENIN.</p>
 
       <button onClick={() => navigate('/InicioUsuario')}>
