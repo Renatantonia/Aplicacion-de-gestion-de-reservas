@@ -9,6 +9,7 @@ import VerHistorialReservas from './VerHistorialReservas';
 import InicioUsuario from './InicioUsuario';
 import HacerReserva from './HacerReserva';
 import ReservaExitosa from './ReservaExitosa';
+import VerMisReservas from './VerMisReservas';
 import './App.css';
 
 function Titulo() {
@@ -48,6 +49,7 @@ function App() {
             <Route path="/InicioUsuario" element={<InicioUsuario/>} />
             <Route path="/HacerReserva" element={<HacerReserva/>} />
             <Route path="/ReservaExitosa" element={<ReservaExitosa />} />
+            <Route path="/mis-reservas" element={<VerMisReservas />} />
           </Routes>
         </Router>
       </div>

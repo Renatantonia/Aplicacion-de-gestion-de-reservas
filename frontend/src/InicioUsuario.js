@@ -25,7 +25,7 @@ function InicioUsuario() {
             </button>
 
             <button
-                onClick={() => navigate('/VerMisReservas')}
+                onClick={() => navigate('/mis-reservas')}
                 style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
             >
                 Ver mis reservas
@@ -41,7 +41,9 @@ function InicioUsuario() {
             <button
                 onClick={() => {
                     localStorage.removeItem('nombreUsuario');
-                    navigate(-1);
+                    localStorage.removeItem('id');
+                    localStorage.removeItem('rol');
+                    navigate('/login');
                 }}
                 style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
             >

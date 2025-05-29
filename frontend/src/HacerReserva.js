@@ -95,6 +95,13 @@ function HacerReserva() {
 
   return (
     <div className='contenedor-hacerReserva'>
+      {/* Botón Volver */}
+      <div style={{ marginBottom: '20px' }}>
+        <button onClick={() => navigate(-1)} style={{ padding: '8px 16px' }}>
+          Volver
+        </button>
+      </div>
+
       <h2>Hacer Reserva</h2>
 
       <h4>Selecciona una cancha</h4>
