@@ -18,7 +18,7 @@ function HacerReserva() {
   ]);
 
   const id_usuario = localStorage.getItem('id');
-  const [mensaje, setMensaje] = useState('');
+  
 
   // Cargar canchas desde el backend
   useEffect(() => {
@@ -51,47 +51,73 @@ function HacerReserva() {
   };
 
   const enviarReserva = async () => {
-    if (!canchaSeleccionada) {
-      alert("Debes seleccionar una cancha");
-      return;
-    }
+  if (!canchaSeleccionada) {
+    alert("Debes seleccionar una cancha");
+    return;
+  }
 
-    if (!filtroDia || !filtroMes || !filtroAnio) {
-      alert("Selecciona una fecha válida.");
-      return;
-    }
+  if (!filtroDia || !filtroMes || !filtroAnio) {
+    alert("Selecciona una fecha válida.");
+    return;
+  }
 
-    const fecha = `${filtroAnio}-${filtroMes}-${filtroDia}`;
+  const fechaStr = `${filtroAnio}-${filtroMes}-${filtroDia}`;
+  const fechaReserva = new Date(fechaStr);
+  const hoy = new Date();
+  const diferenciaDias = (fechaReserva - hoy) / (1000 * 60 * 60 * 24);
 
-    const reserva = {
-      id_usuario,
-      id_cancha: canchaSeleccionada.id,
-      fecha,
-      hora_inicio: horaInicio,
-      hora_fin: horaFin,
-      total_pago: canchaSeleccionada.costo,
-      jugadores
-    };
+  // Validación 1: mínimo 7 días de anticipación
+  if (diferenciaDias < 7) {
+    alert('Debes reservar con al menos 7 días de anticipación.');
+    return;
+  }
 
-    try {
-      const res = await fetch('http://localhost:3001/api/reservas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reserva)
-      });
+  // Validación 2: lunes a viernes
+  const diaSemana = fechaReserva.getDay(); // 0 = domingo, 6 = sábado
+  if (diaSemana === 0 || diaSemana === 6) {
+    alert('Solo se puede reservar de lunes a viernes.');
+    return;
+  }
 
-      const data = await res.json();
-      if (res.ok) {
-        navigate('/ReservaExitosa');
-        setJugadores([{ nombre: '', apellido: '', rut: '', edad: '' }]);
-      } else {
-        alert(data.message || 'Error al guardar la reserva');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('Error al conectar con el servidor');
-    }
+  // Validación 3: horario entre 08:00 y 20:00
+  const horaInicioInt = parseInt(horaInicio.split(':')[0]);
+  const horaFinInt = parseInt(horaFin.split(':')[0]);
+  if (horaInicioInt < 8 || horaFinInt > 20 || horaFinInt <= horaInicioInt) {
+    alert('La reserva debe ser entre 08:00 y 20:00, y la hora de fin debe ser mayor que la de inicio.');
+    return;
+  }
+
+  // Si pasa todas las validaciones, construir el objeto y enviar
+  const reserva = {
+    id_usuario,
+    id_cancha: canchaSeleccionada.id,
+    fecha: fechaStr,
+    hora_inicio: horaInicio,
+    hora_fin: horaFin,
+    total_pago: canchaSeleccionada.costo,
+    jugadores
   };
+
+  try {
+    const res = await fetch('http://localhost:3001/api/reservas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(reserva)
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      navigate('/ReservaExitosa');
+      setJugadores([{ nombre: '', apellido: '', rut: '', edad: '' }]);
+    } else {
+      alert(data.message || 'Error al guardar la reserva');
+    }
+  } catch (error) {
+    console.error(error);
+    alert('Error al conectar con el servidor');
+  }
+};
+
 
   return (
     <div className='contenedor-hacerReserva'>
@@ -166,7 +192,6 @@ function HacerReserva() {
         <button onClick={() => navigate(-1)} style={{ marginLeft: '10px' }}>Cancelar</button>
       </div>
 
-      {mensaje && <p style={{ color: 'green' }}>{mensaje}</p>}
     </div>
   );
 }

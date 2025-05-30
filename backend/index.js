@@ -260,6 +260,117 @@ app.get('/api/canchas', (req, res) => {
   });
 });
 
+app.delete('/api/reservas/:id', (req, res) => {
+  const { id } = req.params;
+
+  const queryFecha = `SELECT fecha FROM reservas WHERE id = ?`;
+  db.query(queryFecha, [id], (err, resultado) => {
+    if (err || resultado.length === 0) {
+      return res.status(404).json({ message: 'Reserva no encontrada' });
+    }
+
+    const fechaReserva = new Date(resultado[0].fecha);
+    const hoy = new Date();
+    const diasDiferencia = (fechaReserva - hoy) / (1000 * 60 * 60 * 24);
+
+    if (diasDiferencia < 7) {
+      return res.status(400).json({ message: 'Solo se puede cancelar con al menos 7 días de anticipación.' });
+    }
+
+    const eliminar = `DELETE FROM reservas WHERE id = ?`;
+    db.query(eliminar, [id], (err2) => {
+      if (err2) {
+        return res.status(500).json({ message: 'Error al cancelar la reserva.' });
+      }
+      res.json({ message: 'Reserva cancelada exitosamente.' });
+    });
+  });
+});
+
+app.get('/api/reserva/:id', (req, res) => {
+  const { id } = req.params;
+
+  const queryReserva = `
+    SELECT r.*, c.nombre AS nombre_cancha
+    FROM reservas r
+    JOIN canchas c ON r.id_cancha = c.id
+    WHERE r.id = ?
+  `;
+
+  const queryJugadores = `
+    SELECT nombre, apellido, rut, edad
+    FROM jugadores_reserva
+    WHERE id_reserva = ?
+  `;
+
+  db.query(queryReserva, [id], (err, reservaResultado) => {
+    if (err || reservaResultado.length === 0) {
+      return res.status(404).json({ message: 'Reserva no encontrada' });
+    }
+
+    const reserva = reservaResultado[0];
+
+    db.query(queryJugadores, [id], (err2, jugadores) => {
+      if (err2) {
+        return res.status(500).json({ message: 'Error al obtener jugadores' });
+      }
+
+      res.json({ ...reserva, jugadores });
+    });
+  });
+});
+
+app.put('/api/reservas/:id', (req, res) => {
+  const { id } = req.params;
+  const { fecha, hora_inicio, hora_fin, id_cancha, jugadores } = req.body;
+
+  if (!fecha || !hora_inicio || !hora_fin || !id_cancha || jugadores.length === 0) {
+    return res.status(400).json({ message: 'Datos incompletos para la actualización' });
+  }
+
+  // Validar los 7 días de anticipación
+  const hoy = new Date();
+  const fechaObj = new Date(fecha);
+  const diff = (fechaObj - hoy) / (1000 * 60 * 60 * 24);
+  if (diff < 7) {
+    return res.status(400).json({ message: 'Solo puedes editar con al menos 7 días de anticipación' });
+  }
+
+  const updateReserva = `
+    UPDATE reservas
+    SET fecha = ?, hora_inicio = ?, hora_fin = ?, id_cancha = ?
+    WHERE id = ?
+  `;
+
+  db.query(updateReserva, [fecha, hora_inicio, hora_fin, id_cancha, id], (err) => {
+    if (err) {
+      console.error('Error actualizando reserva:', err);
+      return res.status(500).json({ message: 'Error al actualizar la reserva' });
+    }
+
+    // Eliminar jugadores anteriores
+    const borrarJugadores = `DELETE FROM jugadores_reserva WHERE id_reserva = ?`;
+    db.query(borrarJugadores, [id], (err2) => {
+      if (err2) {
+        return res.status(500).json({ message: 'Error al limpiar jugadores anteriores' });
+      }
+
+      // Insertar nuevos jugadores
+      const nuevos = jugadores.map(j => [id, j.nombre, j.apellido, j.rut, j.edad]);
+      const insert = `INSERT INTO jugadores_reserva (id_reserva, nombre, apellido, rut, edad) VALUES ?`;
+
+      db.query(insert, [nuevos], (err3) => {
+        if (err3) {
+          return res.status(500).json({ message: 'Error al insertar jugadores actualizados' });
+        }
+
+        res.json({ message: 'Reserva actualizada correctamente' });
+      });
+    });
+  });
+});
+
+
 app.listen(3001, () => {
   console.log('Servidor backend escuchando en http://localhost:3001');
 });
