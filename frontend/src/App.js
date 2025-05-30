@@ -11,6 +11,11 @@ import HacerReserva from './HacerReserva';
 import ReservaExitosa from './ReservaExitosa';
 import VerMisReservas from './VerMisReservas';
 import EditarReserva from './EditarReserva';
+import HistorialAdmin from './HistorialAdmin';
+import EquipamentoAdmin from './EquipamentoAdmin';
+import AnadirCancha from './AnadirCancha';
+import AnadirEquipamiento from './AnadirEquipamiento';
+import ListarEquipamiento from './ListarEquipamiento';
 import './App.css';
 
 function Titulo() {
@@ -43,7 +48,12 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/InicioAdmin" element={<InicioAdmin />} />
-            <Route path="/VerReservas" element={<EditarReservas />} />
+            <Route path="/Admin/EditarReservas" element={<EditarReservas />} />
+            <Route path="/Admin/Historial" element={<HistorialAdmin />} />
+            <Route path="/Admin/Equipamiento" element={<EquipamentoAdmin/>} />
+            <Route path="/Admin/Equipamiento/AnadirCancha" element={<AnadirCancha />} />
+            <Route path="/Admin/Equipamiento/AnadirEquipamiento" element={<AnadirEquipamiento />} />
+            <Route path="//Admin/Equipamiento/ListarEquipamiento" element={<ListarEquipamiento />} />
             <Route path="/VerHistorial" element={<VerHistorial />} />
             <Route path="/ReservasGenerales" element={<ReservasGenerales/>} />
             <Route path="/VerHistorialReservas" element={<VerHistorialReservas/>} />

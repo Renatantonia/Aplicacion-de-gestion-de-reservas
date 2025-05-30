@@ -40,15 +40,14 @@ function InicioUsuario() {
 
             <button
                 onClick={() => {
-                    localStorage.removeItem('nombreUsuario');
-                    localStorage.removeItem('id');
-                    localStorage.removeItem('rol');
-                    navigate('/login');
+                    localStorage.clear(); // o removeItem('id') y 'nombreUsuario' si quieres ser más específico
+                    navigate('/'); // o '/login' si tienes una ruta distinta
                 }}
                 style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
-            >
+                >
                 Cerrar sesión
             </button>
+
         </div>
     );
 }

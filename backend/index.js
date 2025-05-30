@@ -332,7 +332,7 @@ app.put('/api/reservas/:id', (req, res) => {
   const hoy = new Date();
   const fechaObj = new Date(fecha);
   const diff = (fechaObj - hoy) / (1000 * 60 * 60 * 24);
-  if (diff < 7) {
+  if (rol !== 'admin' && diferenciaDias < 7) {
     return res.status(400).json({ message: 'Solo puedes editar con al menos 7 días de anticipación' });
   }
 
@@ -370,6 +370,42 @@ app.put('/api/reservas/:id', (req, res) => {
   });
 });
 
+app.get('/api/reservas-todas', (req, res) => {
+  const query = `
+    SELECT 
+      r.id AS id_reserva,
+      u.nombre AS usuario,
+      c.nombre AS cancha,
+      r.fecha,
+      r.hora_inicio,
+      r.hora_fin,
+      r.total_pago
+    FROM reservas r
+    JOIN usuarios u ON r.id_usuario = u.id
+    JOIN canchas c ON r.id_cancha = c.id
+    ORDER BY r.fecha DESC, r.hora_inicio
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener reservas:', err);
+      return res.status(500).json({ message: 'Error al obtener reservas' });
+    }
+
+    res.json(results);
+  });
+});
+
+app.get('/api/equipamiento', (req, res) => {
+  const query = 'SELECT * FROM equipamiento';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener equipamiento:', err);
+      return res.status(500).json({ message: 'Error al obtener equipamiento' });
+    }
+    res.json(results);
+  });
+});
 
 app.listen(3001, () => {
   console.log('Servidor backend escuchando en http://localhost:3001');
