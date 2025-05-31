@@ -262,6 +262,7 @@ app.get('/api/canchas', (req, res) => {
 
 app.delete('/api/reservas/:id', (req, res) => {
   const { id } = req.params;
+  const { rol } = req.query; // Lo recibes como ?rol=admin
 
   const queryFecha = `SELECT fecha FROM reservas WHERE id = ?`;
   db.query(queryFecha, [id], (err, resultado) => {
@@ -273,8 +274,11 @@ app.delete('/api/reservas/:id', (req, res) => {
     const hoy = new Date();
     const diasDiferencia = (fechaReserva - hoy) / (1000 * 60 * 60 * 24);
 
-    if (diasDiferencia < 7) {
-      return res.status(400).json({ message: 'Solo se puede cancelar con al menos 7 días de anticipación.' });
+    // Solo aplica restricción si el rol no es admin
+    if (rol !== 'admin' && diasDiferencia < 7) {
+      return res.status(400).json({
+        message: 'Solo se puede cancelar con al menos 7 días de anticipación.'
+      });
     }
 
     const eliminar = `DELETE FROM reservas WHERE id = ?`;
@@ -396,6 +400,19 @@ app.get('/api/reservas-todas', (req, res) => {
   });
 });
 
+app.post('/api/equipamiento', (req, res) => {
+  const { nombre, stock, costo } = req.body;
+  const query = 'INSERT INTO equipamiento (nombre, stock, costo) VALUES (?, ?, ?)';
+
+  db.query(query, [nombre, stock, costo], (err, result) => {
+    if (err) {
+      console.error('Error al insertar equipamiento:', err);
+      return res.status(500).json({ message: 'Error al insertar equipamiento' });
+    }
+    res.status(201).json({ message: 'Equipamiento registrado exitosamente' });
+  });
+});
+
 app.get('/api/equipamiento', (req, res) => {
   const query = 'SELECT * FROM equipamiento';
   db.query(query, (err, results) => {
@@ -406,6 +423,24 @@ app.get('/api/equipamiento', (req, res) => {
     res.json(results);
   });
 });
+
+app.post('/api/canchas', (req, res) => {
+  const { nombre, tipo, costo, max_jugadores } = req.body;
+
+  const query = `
+    INSERT INTO canchas (nombre, tipo, costo, max_jugadores)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.query(query, [nombre, tipo, costo, max_jugadores], (err, result) => {
+    if (err) {
+      console.error('Error al insertar cancha:', err);
+      return res.status(500).json({ message: 'Error al registrar la cancha' });
+    }
+    res.status(201).json({ message: 'Cancha registrada exitosamente' });
+  });
+});
+
 
 app.listen(3001, () => {
   console.log('Servidor backend escuchando en http://localhost:3001');

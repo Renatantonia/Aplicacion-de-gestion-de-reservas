@@ -114,7 +114,7 @@ function EditarReserva() {
       ))}
 
       <button onClick={guardarCambios}>Guardar cambios</button>
-      <button onClick={() => navigate(-1)} style={{ marginLeft: '10px' }}>← Volver</button>
+      <button onClick={() => navigate(-1)} style={{ marginLeft: '10px' }}>Volver</button>
       {mensaje && <p>{mensaje}</p>}
     </div>
   );
