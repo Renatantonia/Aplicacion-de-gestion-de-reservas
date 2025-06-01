@@ -16,7 +16,9 @@ import EquipamentoAdmin from './EquipamentoAdmin';
 import AnadirCancha from './AnadirCancha';
 import AnadirEquipamiento from './AnadirEquipamiento';
 import ListarEquipamiento from './ListarEquipamiento';
+import HacerPago from './HacerPago';
 import './App.css';
+import AnadirSaldo from './AnadirSaldo';
 
 function Titulo() {
   return (
@@ -62,6 +64,8 @@ function App() {
             <Route path="/ReservaExitosa" element={<ReservaExitosa />} />
             <Route path="/mis-reservas" element={<VerMisReservas />} />
             <Route path="/editar-reserva/:id" element={<EditarReserva />} />
+            <Route path="/pago" element={<HacerPago/>} /> 
+            <Route path="/AnadirSaldo" element={<AnadirSaldo/>} /> 
           </Routes>
         </Router>
       </div>

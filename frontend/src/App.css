@@ -140,13 +140,15 @@ button:hover {
   font-size: 14px;
 }
 
-.contenedor-hacerReserva{
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 30px;
+.contenedor-hacerReserva {
+  max-width: 600px;
+  margin: 40px auto;
   padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+
 
 
 /* Estilo para los nombres clicables */

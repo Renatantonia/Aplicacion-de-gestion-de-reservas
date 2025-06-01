@@ -441,6 +441,41 @@ app.post('/api/canchas', (req, res) => {
   });
 });
 
+app.post('/api/saldo/agregar', (req, res) => {
+  const { id_usuario, monto } = req.body;
+
+  if (!id_usuario || monto == null) {
+    return res.status(400).json({ message: 'Faltan datos requeridos.' });
+  }
+
+  const query = `
+    UPDATE saldo
+    SET monto_total = monto_total + ?
+    WHERE id_usuario = ?
+  `;
+
+  db.query(query, [monto, id_usuario], (err, result) => {
+    if (err) {
+      console.error('Error al actualizar saldo:', err);
+      return res.status(500).json({ message: 'Error al agregar saldo.' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado en la tabla saldo.' });
+    }
+
+    res.status(200).json({ message: 'Saldo agregado exitosamente.' });
+  });
+});
+
+app.get('/api/saldo/:id', (req, res) => {
+  const id = req.params.id;
+  db.query('SELECT monto_total FROM saldo WHERE id_usuario = ?', [id], (err, result) => {
+    if (err) return res.status(500).json({ message: 'Error al consultar saldo' });
+    if (result.length === 0) return res.status(404).json({ message: 'Usuario no encontrado' });
+    res.json(result[0]);
+  });
+});
 
 app.listen(3001, () => {
   console.log('Servidor backend escuchando en http://localhost:3001');

@@ -5,8 +5,10 @@ function InicioUsuario() {
     const [nombre, setNombre] = useState('');
     const navigate = useNavigate();
 
+    const nombreGuardado = localStorage.getItem('nombre');
+    
     useEffect(() => {
-        const nombreGuardado = localStorage.getItem('nombreUsuario');
+        
         if (nombreGuardado) {
             setNombre(nombreGuardado);
         }
@@ -14,7 +16,7 @@ function InicioUsuario() {
 
     return (
         <div style={{ padding: '50px', textAlign: 'center' }}>
-            <h1>Has ingresado como {nombre}!</h1>
+            <h1>Has ingresado como {nombreGuardado}!</h1> 
             <p>Selecciona una opción:</p>
 
             <button
@@ -32,7 +34,7 @@ function InicioUsuario() {
             </button>
 
             <button
-                onClick={() => navigate('/AñadirSaldo')}
+                onClick={() => navigate('/AnadirSaldo')}
                 style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
             >
                 Añadir Saldo

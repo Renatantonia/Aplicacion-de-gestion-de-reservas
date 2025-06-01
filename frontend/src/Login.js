@@ -24,6 +24,7 @@ function Login() {
       //  Guardar datos de sesión en localStorage
       localStorage.setItem('id', data.usuario.id);     // <-- muy importante
       localStorage.setItem('rol', data.usuario.rol);   // <-- opcional, útil para vistas
+      localStorage.setItem('nombre',data.usuario.nombre);
 
       //  Redirigir según el rol
       if (data.usuario.rol === 'admin') {
