@@ -15,7 +15,9 @@ function HacerReserva() {
   const [horaFin, setHoraFin] = useState('11:00');
   const [jugadores, setJugadores] = useState([{ nombre: '', apellido: '', rut: '', edad: '' }]);
   const id_usuario = localStorage.getItem('id');
-  
+  const [equipamientos, setEquipamientos] = useState([]);
+  const [agregados, setAgregados] = useState({}); // { id: cantidad }
+
   useEffect(() => {
     fetch('http://localhost:3001/api/canchas')
       .then(res => res.json())
@@ -23,6 +25,12 @@ function HacerReserva() {
       .catch(err => console.error('Error al cargar canchas:', err));
   }, []);
 
+  useEffect(() => {
+    fetch('http://localhost:3001/api/equipamiento')
+      .then(res => res.json())
+      .then(data => setEquipamientos(data))
+      .catch(error => console.error('Error al obtener equipamiento:', error));
+  }, []);
 
   const agregarJugador = () => {
     if (!canchaSeleccionada) {
@@ -98,6 +106,7 @@ function HacerReserva() {
         
         try {
           await descontarSaldo();
+          await descontarEquipamiento();
         } catch (error) {
           alert('Reserva realizada, pero hubo un error al descontar el saldo');
         }
@@ -112,6 +121,42 @@ function HacerReserva() {
       alert('Error al conectar con el servidor');
     }
 
+  };
+
+  const descontarEquipamiento = async () => {
+    try {
+      console.log('Equipamientos a enviar al backend:', JSON.stringify(
+        Object.entries(agregados).map(([id, cantidad]) => ({
+          id: parseInt(id),
+          cantidad
+        }))
+      ));
+
+      const respuesta = await fetch('http://localhost:3001/api/descontarEquipamientos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          Object.entries(agregados).map(([id, cantidad]) => ({
+            id: parseInt(id),
+            cantidad
+          }))
+        )
+      });
+
+      if (!respuesta.ok) {
+        const errorData = await respuesta.json();
+        throw new Error(errorData.message || 'Error al descontar equipamientos');
+      }
+
+      const resultado = await respuesta.json();
+      console.log('Equipamientos descontados correctamente:', resultado);
+
+    } catch (error) {
+      console.error('Error al descontar equipamientos:', error);
+      alert('Hubo un problema al descontar los equipamientos');
+    }
   };
 
 
@@ -149,6 +194,7 @@ function HacerReserva() {
       alert('Error de red al descontar saldo');
     }
   };
+  
 
 
 
@@ -190,10 +236,79 @@ function HacerReserva() {
         </>
       )}
 
-      {/* PASO 2: Fecha y horario */}
+      {/* PASO 2: Seleccionar Equipamiento */}
       {pasoActual === 2 && (
         <>
-          <h4>Paso 2: Selecciona fecha y horario</h4>
+          <h4>Paso 2: Selecciona equipamiento</h4>
+          {equipamientos.length === 0 ? (
+            <p>No hay equipamientos disponibles.</p>
+          ) : (
+            equipamientos.map((eq) => {
+              const cantidadAgregada = agregados[eq.id] || 0;
+              const stockVisible = eq.stock - cantidadAgregada;
+              const sinStock = stockVisible <= 0;
+
+              return (
+                <div
+                  key={eq.id}
+                  style={{
+                    marginBottom: '15px',
+                    padding: '10px',
+                    border: '1px solid #ccc',
+                    borderRadius: '8px',
+                    backgroundColor: sinStock ? '#f0f0f0' : 'white',
+                    color: sinStock ? '#999' : 'black'
+                  }}
+                >
+                  <strong>{eq.nombre}</strong>
+                  <p>Stock disponible: {stockVisible}</p>
+                  <p>Costo por unidad: ${eq.costo}</p>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <button
+                      disabled={cantidadAgregada <= 0}
+                      onClick={() =>
+                        setAgregados((prev) => ({
+                          ...prev,
+                          [eq.id]: Math.max(0, prev[eq.id] - 1)
+                        }))
+                      }
+                    >
+                      −
+                    </button>
+
+                    <span>{cantidadAgregada} agregada(s)</span>
+
+                    <button
+                      disabled={stockVisible <= 0}
+                      onClick={() =>
+                        setAgregados((prev) => ({
+                          ...prev,
+                          [eq.id]: (prev[eq.id] || 0) + 1
+                        }))
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <br />
+          <button onClick={() => setPasoActual(1)}>Atrás</button>
+          <button onClick={() => setPasoActual(3)}>Siguiente</button>
+        </>
+      )}
+
+
+
+
+
+      {/* PASO 2: Fecha y horario */}
+      {pasoActual === 3 && (
+        <>
+          <h4>Paso 3: Selecciona fecha y horario</h4>
           <div>
             <select onChange={(e) => setFiltroDia(e.target.value)} value={filtroDia}>
               <option value="">Día</option>
@@ -222,15 +337,15 @@ function HacerReserva() {
             <input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} />
             <input type="time" value={horaFin} onChange={(e) => setHoraFin(e.target.value)} />
           </div>
-          <button onClick={() => setPasoActual(1)}>Atrás</button>
-          <button onClick={() => setPasoActual(3)} style={{ marginLeft: '10px' }}>Siguiente</button>
+          <button onClick={() => setPasoActual(2)}>Atrás</button>
+          <button onClick={() => setPasoActual(4)} style={{ marginLeft: '10px' }}>Siguiente</button>
         </>
       )}
 
-      {/* PASO 3: Jugadores */}
-      {pasoActual === 3 && (
+      {/* PASO 4: Jugadores */}
+      {pasoActual === 4 && (
         <>
-          <h4>Paso 3: Jugadores ({jugadores.length})</h4>
+          <h4>Paso 4: Jugadores ({jugadores.length})</h4>
           {jugadores.map((j, i) => (
             <div key={i} style={{ marginBottom: '10px' }}>
               <input placeholder="Nombre" value={j.nombre} onChange={e => actualizarJugador(i, 'nombre', e.target.value)} />
@@ -242,15 +357,15 @@ function HacerReserva() {
           ))}
           <button type="button" onClick={agregarJugador}>+ Agregar jugador</button>
           <br />
-          <button onClick={() => setPasoActual(2)}>Atrás</button>
-          <button onClick={() => setPasoActual(4)} >Siguiente</button>
+          <button onClick={() => setPasoActual(3)}>Atrás</button>
+          <button onClick={() => setPasoActual(5)} >Siguiente</button>
         </>
       )}
 
       {/* PASO 5: Resumen y Confirmación */}
-      {pasoActual === 4 && (
+      {pasoActual === 5 && (
         <>
-          <h4>Paso 4: Datos de Reserva</h4>
+          <h4>Paso 5: Datos de Reserva</h4>
           <p><strong>Cancha:</strong> {canchaSeleccionada?.nombre}</p>
           <p><strong>Fecha:</strong> {`${filtroDia}-${filtroMes}-${filtroAnio}`}</p>
           <p><strong>Horario:</strong> {horaInicio} a {horaFin}</p>
@@ -260,15 +375,15 @@ function HacerReserva() {
               <li key={i}>{j.nombre} {j.apellido} - {j.rut} - {j.edad} años</li>
             ))}
           </ul>
-          <button onClick={() => setPasoActual(3)}>Atrás</button>
-          <button onClick={() => setPasoActual(5)} >Siguiente</button>
+          <button onClick={() => setPasoActual(4)}>Atrás</button>
+          <button onClick={() => setPasoActual(6)} >Siguiente</button>
         </>
       )}
 
-            {/* PASO 4: Hacer Pago */}
-      {pasoActual === 5 && (
+      {/* PASO 6: Hacer Pago */}
+      {pasoActual === 6 && (
         <>
-          <h4> Paso 4: Confirmar Pago</h4>
+          <h4> Paso 6: Confirmar Pago</h4>
           <p><strong>Total a Pagar:</strong> {canchaSeleccionada?.costo}</p>
           <button className="button-accept" onClick={enviarReserva}>Confirmar reserva</button>
         </>

@@ -513,11 +513,69 @@ app.post('/api/descontar/saldo', (req, res) => {
   });
 });
 
+app.post('/api/agregar/equipamiento', (req, res) => {
+  const { id_reserva, id_equipamiento, cantidad } = req.body;
+
+  const query = `
+    INSERT INTO equipamiento_reserva (id_reserva, id_equipamiento, cantidad)
+    VALUES (?, ?, ?)
+  `;
+
+  db.query(query, [id_reserva, id_equipamiento, cantidad], (error, result) => {
+    if (error) {
+      console.error('Error al insertar equipamiento:', error);
+      res.status(500).json({ mensaje: 'Error al agregar equipamiento a la reserva' });
+    } else {
+      res.status(200).json({ mensaje: 'Equipamiento agregado correctamente a la reserva' });
+    }
+  });
+});
+
+app.get('/api/equipamiento', (req, res) => {
+  const query = 'SELECT id, nombre, stock, costo FROM equipamiento';
+
+  db.query(query, (error, result) => {
+    if (error) {
+      console.error('Error al obtener el equipamiento:', error);
+      res.status(500).json({ mensaje: 'Error al obtener el equipamiento' });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+app.post('/api/descontarEquipamientos', (req, res) => {
+  const equipamientos = req.body;
+
+  if (!Array.isArray(equipamientos)) {
+    return res.status(400).json({ message: 'Formato de datos incorrecto' });
+  }
+
+  const promises = equipamientos.map(eq => {
+    const query = 'UPDATE equipamiento SET stock = stock - ? WHERE id = ? AND stock >= ?';
+    return new Promise((resolve, reject) => {
+      db.query(query, [eq.cantidad, eq.id, eq.cantidad], (err, result) => {
+        if (err) {
+          reject(err);
+        } else if (result.affectedRows === 0) {
+          reject(new Error(`Stock insuficiente para el equipamiento con id ${eq.id}`));
+        } else {
+          resolve();
+        }
+      });
+    });
+  });
+
+  Promise.all(promises)
+    .then(() => res.status(200).json({ message: 'Stock actualizado correctamente' }))
+    .catch(error => {
+      console.error('Error al descontar equipamientos:', error);
+      res.status(500).json({ message: error.message || 'Error al descontar equipamientos' });
+    });
+});
+
 
 
 app.listen(3001, () => {
   console.log('Servidor backend escuchando en http://localhost:3001');
 });
-
-
-
