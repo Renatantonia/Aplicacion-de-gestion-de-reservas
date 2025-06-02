@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function HacerReserva() {
+  
   const navigate = useNavigate();
 
   const [pasoActual, setPasoActual] = useState(1);
@@ -14,13 +15,14 @@ function HacerReserva() {
   const [horaFin, setHoraFin] = useState('11:00');
   const [jugadores, setJugadores] = useState([{ nombre: '', apellido: '', rut: '', edad: '' }]);
   const id_usuario = localStorage.getItem('id');
-
+  
   useEffect(() => {
     fetch('http://localhost:3001/api/canchas')
       .then(res => res.json())
       .then(data => setCanchas(data))
       .catch(err => console.error('Error al cargar canchas:', err));
   }, []);
+
 
   const agregarJugador = () => {
     if (!canchaSeleccionada) {
@@ -89,9 +91,17 @@ function HacerReserva() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reserva)
       });
-
+      
       const data = await res.json();
+
       if (res.ok) {
+        
+        try {
+          await descontarSaldo();
+        } catch (error) {
+          alert('Reserva realizada, pero hubo un error al descontar el saldo');
+        }
+
         navigate('/ReservaExitosa');
         setJugadores([{ nombre: '', apellido: '', rut: '', edad: '' }]);
       } else {
@@ -101,20 +111,59 @@ function HacerReserva() {
       console.error(error);
       alert('Error al conectar con el servidor');
     }
+
   };
+
+
+  const descontarSaldo = async () => {
+    
+    const id_usuario = localStorage.getItem('id');
+    const monto = canchaSeleccionada?.costo;
+
+    if (!id_usuario || !monto) {
+    console.error('Datos inválidos para descontar saldo:', { id_usuario, monto });
+    return;
+    }
+
+
+    try {
+      console.log('🔁 Enviando datos para descontar saldo:', { id_usuario, monto });
+      const response = await fetch('http://localhost:3001/api/descontar/saldo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id_usuario, monto })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Nuevo saldo:', data.nuevoSaldo);
+        alert('Saldo descontado correctamente');
+      } else {
+        console.error('Respuesta no OK:', await response.text()); // más detalles
+        alert('Error al descontar saldo');
+      }
+    } catch (error) {
+      console.error('Error en fetch:', error);
+      alert('Error de red al descontar saldo');
+    }
+  };
+
+
 
   return (
     <div style = {{ position: 'relative', padding: '40px' }}>
       <button
-        className="button"
+        className="button-decline"
         onClick={() => navigate(-1)}
         style={{
           position: 'absolute',
-          top: '20px',
-          left: '20px'
+          top: '35px',
+          left: '35px'
         }}
       >
-        Volver a inicio
+        X
       </button>
 
     <div className="contenedor-hacerReserva" style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
@@ -194,30 +243,14 @@ function HacerReserva() {
           <button type="button" onClick={agregarJugador}>+ Agregar jugador</button>
           <br />
           <button onClick={() => setPasoActual(2)}>Atrás</button>
-          <button
-                onClick={() => navigate('/pago', {
-                  state: {
-                    canchaSeleccionada,
-                    filtroDia,
-                    filtroMes,
-                    filtroAnio,
-                    horaInicio,
-                    horaFin,
-                    jugadores,
-                    volverDePago: true
-                  }
-                })}
-                style={{ marginLeft: '10px' }}
-              >
-                Siguiente
-              </button>
+          <button onClick={() => setPasoActual(4)} >Siguiente</button>
         </>
       )}
 
-      {/* PASO 4: Resumen y Confirmación */}
+      {/* PASO 5: Resumen y Confirmación */}
       {pasoActual === 4 && (
         <>
-          <h4>Paso 4: Confirmar Reserva</h4>
+          <h4>Paso 4: Datos de Reserva</h4>
           <p><strong>Cancha:</strong> {canchaSeleccionada?.nombre}</p>
           <p><strong>Fecha:</strong> {`${filtroDia}-${filtroMes}-${filtroAnio}`}</p>
           <p><strong>Horario:</strong> {horaInicio} a {horaFin}</p>
@@ -228,7 +261,16 @@ function HacerReserva() {
             ))}
           </ul>
           <button onClick={() => setPasoActual(3)}>Atrás</button>
-          <button onClick={enviarReserva} style={{ marginLeft: '10px' }}>Confirmar reserva</button>
+          <button onClick={() => setPasoActual(5)} >Siguiente</button>
+        </>
+      )}
+
+            {/* PASO 4: Hacer Pago */}
+      {pasoActual === 5 && (
+        <>
+          <h4> Paso 4: Confirmar Pago</h4>
+          <p><strong>Total a Pagar:</strong> {canchaSeleccionada?.costo}</p>
+          <button className="button-accept" onClick={enviarReserva}>Confirmar reserva</button>
         </>
       )}
     </div>
