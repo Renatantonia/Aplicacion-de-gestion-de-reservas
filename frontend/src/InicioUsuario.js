@@ -16,7 +16,7 @@ function InicioUsuario() {
 
     return (
         <div style={{ padding: '50px', textAlign: 'center' }}>
-            <h1>Has ingresado como {nombreGuardado}!</h1> 
+            <h1>Has ingresado como {nombre}!</h1> 
             <p>Selecciona una opción:</p>
 
             <button
