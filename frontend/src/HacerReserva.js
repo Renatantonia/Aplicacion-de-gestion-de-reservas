@@ -237,7 +237,7 @@ function HacerReserva() {
       )}
 
       {/* PASO 2: Seleccionar Equipamiento */}
-      {pasoActual === 2 && (
+      {pasoActual === 3 && (
         <>
           <h4>Paso 2: Selecciona equipamiento</h4>
           {equipamientos.length === 0 ? (
@@ -296,8 +296,8 @@ function HacerReserva() {
             })
           )}
           <br />
-          <button onClick={() => setPasoActual(1)}>Atrás</button>
-          <button onClick={() => setPasoActual(3)}>Siguiente</button>
+          <button onClick={() => setPasoActual(2)}>Atrás</button>
+          <button onClick={() => setPasoActual(4)}>Siguiente</button>
         </>
       )}
 
@@ -306,7 +306,7 @@ function HacerReserva() {
 
 
       {/* PASO 2: Fecha y horario */}
-      {pasoActual === 3 && (
+      {pasoActual === 2 && (
         <>
           <h4>Paso 3: Selecciona fecha y horario</h4>
           <div>
@@ -337,8 +337,8 @@ function HacerReserva() {
             <input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} />
             <input type="time" value={horaFin} onChange={(e) => setHoraFin(e.target.value)} />
           </div>
-          <button onClick={() => setPasoActual(2)}>Atrás</button>
-          <button onClick={() => setPasoActual(4)} style={{ marginLeft: '10px' }}>Siguiente</button>
+          <button onClick={() => setPasoActual(1)}>Atrás</button>
+          <button onClick={() => setPasoActual(3)} style={{ marginLeft: '10px' }}>Siguiente</button>
         </>
       )}
 

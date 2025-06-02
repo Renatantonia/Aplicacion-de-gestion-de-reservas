@@ -18,7 +18,7 @@ function InicioAdmin() {
       </button>
 
       <button onClick={() => navigate('/Admin/Equipamiento')} style={estiloBoton}>
-        Ver Equipamiento
+        Equipamiento y Canchas
       </button>
 
       <button
