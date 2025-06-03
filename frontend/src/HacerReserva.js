@@ -19,7 +19,6 @@ function HacerReserva() {
   const [agregados, setAgregados] = useState({}); // { id: cantidad }
   const [canchasDisponibles, setCanchasDisponibles] = useState([]);
   const [disponibilidadConsultada, setDisponibilidadConsultada] = useState(false);
-  const [montoTotal, setMontoTotal] = useState(0);
 
 
   useEffect(() => {
