@@ -17,6 +17,9 @@ function HacerReserva() {
   const id_usuario = localStorage.getItem('id');
   const [equipamientos, setEquipamientos] = useState([]);
   const [agregados, setAgregados] = useState({}); // { id: cantidad }
+  const [canchasDisponibles, setCanchasDisponibles] = useState([]);
+  const [disponibilidadConsultada, setDisponibilidadConsultada] = useState(false);
+
 
   useEffect(() => {
     fetch('http://localhost:3001/api/canchas')
@@ -31,6 +34,21 @@ function HacerReserva() {
       .then(data => setEquipamientos(data))
       .catch(error => console.error('Error al obtener equipamiento:', error));
   }, []);
+
+  const consultarCanchasDisponibles = async () => {
+    setDisponibilidadConsultada(false);
+    const fecha = `${filtroAnio}-${filtroMes}-${filtroDia}`;
+    try {
+      const res = await fetch(`http://localhost:3001/api/canchas/disponibles?fecha=${fecha}&hora_inicio=${horaInicio}&hora_fin=${horaFin}`);
+      const data = await res.json();
+      setCanchasDisponibles(data);
+      setDisponibilidadConsultada(true);
+    } catch (err) {
+      console.error("Error al consultar disponibilidad:", err);
+      setCanchasDisponibles([]);
+      setDisponibilidadConsultada(true);
+    }
+  };
 
   const agregarJugador = () => {
     if (!canchaSeleccionada) {
@@ -216,28 +234,8 @@ function HacerReserva() {
       
       <h2>Hacer Reserva</h2>
 
-      {/* PASO 1: Seleccionar cancha */}
-      {pasoActual === 1 && (
-        <>
-          <h4>Paso 1: Selecciona una cancha</h4>
-          <select onChange={(e) => {
-            const cancha = canchas.find(c => c.id === parseInt(e.target.value));
-            setCanchaSeleccionada(cancha);
-          }}>
-            <option value="">-- Elige cancha --</option>
-            {canchas.map((cancha) => (
-              <option key={cancha.id} value={cancha.id}>
-                {cancha.nombre} - ${cancha.costo} - Máx {cancha.max_jugadores} jugadores
-              </option>
-            ))}
-          </select>
-          <br />
-          <button onClick={() => setPasoActual(2)} disabled={!canchaSeleccionada}>Siguiente</button>
-        </>
-      )}
-
-      {/* PASO 3: Seleccionar Equipamiento */}
-      {pasoActual === 3 && (
+      {/* PASO 2: Seleccionar Equipamiento */}
+      {pasoActual === 2 && (
         <>
           <h4>Paso 2: Selecciona equipamiento</h4>
           {equipamientos.length === 0 ? (
@@ -296,19 +294,16 @@ function HacerReserva() {
             })
           )}
           <br />
-          <button onClick={() => setPasoActual(2)}>Atrás</button>
-          <button onClick={() => setPasoActual(4)}>Siguiente</button>
+          <button onClick={() => setPasoActual(1)}>Atrás</button>
+          <button onClick={() => setPasoActual(3)}>Siguiente</button>
         </>
       )}
 
 
-
-
-
-      {/* PASO 2: Fecha y horario */}
-      {pasoActual === 2 && (
+      {/* PASO 1: Fecha y horario/consultar disponibilidad de canchas */}
+      {pasoActual === 1 && (
         <>
-          <h4>Paso 3: Selecciona fecha y horario</h4>
+          <h4>Paso 1: Selecciona fecha y horario</h4>
           <div>
             <select onChange={(e) => setFiltroDia(e.target.value)} value={filtroDia}>
               <option value="">Día</option>
@@ -330,22 +325,49 @@ function HacerReserva() {
             </select>
             <select onChange={(e) => setFiltroAnio(e.target.value)} value={filtroAnio}>
               <option value="">Año</option>
-              {[2024, 2025].map(a => <option key={a} value={a}>{a}</option>)}
+              {[2025, 2026].map(a => <option key={a} value={a}>{a}</option>)}
             </select>
           </div>
           <div>
             <input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} />
             <input type="time" value={horaFin} onChange={(e) => setHoraFin(e.target.value)} />
           </div>
-          <button onClick={() => setPasoActual(1)}>Atrás</button>
-          <button onClick={() => setPasoActual(3)} style={{ marginLeft: '10px' }}>Siguiente</button>
-        </>
+
+          {horaInicio && horaFin && filtroDia && filtroMes && filtroAnio && (
+              <>
+                <br />
+                <button onClick={consultarCanchasDisponibles}>Consultar disponibilidad</button>
+                {canchasDisponibles.length > 0 ? (
+                  <div>
+                    <h4>Canchas disponibles para horario escogido:</h4>
+                    <select onChange={(e) => {
+                      const cancha = canchasDisponibles.find(c => c.id === parseInt(e.target.value));
+                      setCanchaSeleccionada(cancha);
+                    }}>
+                      <option value="">-- Elige cancha --</option>
+                      {canchasDisponibles.map((cancha) => (
+                        <option key={cancha.id} value={cancha.id}>
+                          {cancha.nombre} - ${cancha.costo} - ({cancha.max_jugadores} jugadores máximos)
+                        </option>
+                      ))}
+                    </select>
+                    <br />
+                    <button onClick={() => setPasoActual(2)} disabled={!canchaSeleccionada}>Siguiente</button>
+                  </div>
+                ) : (
+                  disponibilidadConsultada && <p>No hay canchas disponibles para ese horario.</p>
+                )}
+              </>
+              )}
+
+            
+          </>
       )}
 
       {/* PASO 4: Jugadores */}
-      {pasoActual === 4 && (
+      {pasoActual === 3 && (
         <>
-          <h4>Paso 4: Jugadores ({jugadores.length})</h4>
+          <h4>Paso 3: Jugadores ({jugadores.length})</h4>
           {jugadores.map((j, i) => (
             <div key={i} style={{ marginBottom: '10px' }}>
               <input placeholder="Nombre" value={j.nombre} onChange={e => actualizarJugador(i, 'nombre', e.target.value)} />
@@ -357,15 +379,15 @@ function HacerReserva() {
           ))}
           <button type="button" onClick={agregarJugador}>+ Agregar jugador</button>
           <br />
-          <button onClick={() => setPasoActual(3)}>Atrás</button>
-          <button onClick={() => setPasoActual(5)} >Siguiente</button>
+          <button onClick={() => setPasoActual(2)}>Atrás</button>
+          <button onClick={() => setPasoActual(4)} >Siguiente</button>
         </>
       )}
 
       {/* PASO 5: Resumen y Confirmación */}
-      {pasoActual === 5 && (
+      {pasoActual === 4 && (
         <>
-          <h4>Paso 5: Datos de Reserva</h4>
+          <h4>Paso 4: Datos de Reserva</h4>
           <p><strong>Cancha:</strong> {canchaSeleccionada?.nombre}</p>
           <p><strong>Fecha:</strong> {`${filtroDia}-${filtroMes}-${filtroAnio}`}</p>
           <p><strong>Horario:</strong> {horaInicio} a {horaFin}</p>
@@ -375,15 +397,15 @@ function HacerReserva() {
               <li key={i}>{j.nombre} {j.apellido} - {j.rut} - {j.edad} años</li>
             ))}
           </ul>
-          <button onClick={() => setPasoActual(4)}>Atrás</button>
-          <button onClick={() => setPasoActual(6)} >Siguiente</button>
+          <button onClick={() => setPasoActual(3)}>Atrás</button>
+          <button onClick={() => setPasoActual(5)} >Siguiente</button>
         </>
       )}
 
       {/* PASO 6: Hacer Pago */}
-      {pasoActual === 6 && (
+      {pasoActual === 5 && (
         <>
-          <h4> Paso 6: Confirmar Pago</h4>
+          <h4> Paso 5: Confirmar Pago</h4>
           <p><strong>Total a Pagar:</strong> {canchaSeleccionada?.costo}</p>
           <button className="button-accept" onClick={enviarReserva}>Confirmar reserva</button>
         </>
