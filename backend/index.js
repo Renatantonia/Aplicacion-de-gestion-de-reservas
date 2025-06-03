@@ -574,6 +574,28 @@ app.post('/api/descontarEquipamientos', (req, res) => {
     });
 });
 
+// GET /api/canchas-disponibles
+app.get('/api/canchas/disponibles', (req, res) => {
+  const { fecha, hora_inicio, hora_fin } = req.query;
+
+  const query = `
+    SELECT * FROM canchas WHERE id NOT IN (
+      SELECT id_cancha FROM reservas
+      WHERE fecha = ? AND (
+        (hora_inicio < ? AND hora_fin > ?) OR
+        (hora_inicio >= ? AND hora_inicio < ?)
+      )
+    )
+  `;
+
+  db.query(query, [fecha, hora_fin, hora_inicio, hora_inicio, hora_fin], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Error en la base de datos" });
+    }
+    res.json(results);
+  });
+});
 
 
 app.listen(3001, () => {

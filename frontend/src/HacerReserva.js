@@ -236,7 +236,7 @@ function HacerReserva() {
         </>
       )}
 
-      {/* PASO 2: Seleccionar Equipamiento */}
+      {/* PASO 3: Seleccionar Equipamiento */}
       {pasoActual === 3 && (
         <>
           <h4>Paso 2: Selecciona equipamiento</h4>
