@@ -220,7 +220,7 @@ function HacerReserva() {
     <div style = {{ position: 'relative', padding: '40px' }}>
       <button
         className="button-decline"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/InicioAdmin')}
         style={{
           position: 'absolute',
           top: '35px',

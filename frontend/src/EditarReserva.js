@@ -46,21 +46,27 @@ function EditarReserva() {
       hora_inicio: reserva.hora_inicio,
       hora_fin: reserva.hora_fin,
       id_cancha: reserva.id_cancha,
-      jugadores
+      jugadores,
+      rol: localStorage.getItem('rol')
     };
 
-    const res = await fetch(`http://localhost:3001/api/reservas/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+    try {
+      const res = await fetch(`http://localhost:3001/api/reservas/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      alert('Reserva actualizada exitosamente');
-      navigate('/mis-reservas');
-    } else {
-      alert(data.message || 'Error al actualizar');
+      const data = await res.json();
+      if (res.ok) {
+        alert('Reserva actualizada exitosamente');
+        navigate('/InicioAdmin');
+      } else {
+        alert(data.message || 'Error al actualizar');
+      }
+    }catch(error) {
+        console.error('Error en la solicitud:', error);
+        alert('Error de conexión al actualizar la reserva');
     }
   };
 

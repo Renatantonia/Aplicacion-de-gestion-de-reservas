@@ -327,7 +327,7 @@ app.get('/api/reserva/:id', (req, res) => {
 
 app.put('/api/reservas/:id', (req, res) => {
   const { id } = req.params;
-  const { fecha, hora_inicio, hora_fin, id_cancha, jugadores } = req.body;
+  const { fecha, hora_inicio, hora_fin, id_cancha, jugadores, rol } = req.body;
 
   if (!fecha || !hora_inicio || !hora_fin || !id_cancha || jugadores.length === 0) {
     return res.status(400).json({ message: 'Datos incompletos para la actualización' });
@@ -337,7 +337,7 @@ app.put('/api/reservas/:id', (req, res) => {
   const hoy = new Date();
   const fechaObj = new Date(fecha);
   const diff = (fechaObj - hoy) / (1000 * 60 * 60 * 24);
-  if (rol !== 'admin' && diferenciaDias < 7) {
+  if (rol !== 'admin' && diff < 7) {
     return res.status(400).json({ message: 'Solo puedes editar con al menos 7 días de anticipación' });
   }
 
