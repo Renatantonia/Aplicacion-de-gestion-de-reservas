@@ -513,6 +513,8 @@ app.post('/api/descontar/saldo', (req, res) => {
   });
 });
 
+
+
 app.post('/api/agregar/equipamiento', (req, res) => {
   const { id_reserva, id_equipamiento, cantidad } = req.body;
 
@@ -530,6 +532,7 @@ app.post('/api/agregar/equipamiento', (req, res) => {
     }
   });
 });
+
 
 app.get('/api/equipamiento', (req, res) => {
   const query = 'SELECT id, nombre, stock, costo FROM equipamiento';

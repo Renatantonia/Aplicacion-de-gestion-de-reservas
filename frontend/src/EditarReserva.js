@@ -9,7 +9,7 @@ function EditarReserva() {
   const [canchas, setCanchas] = useState([]);
   const [jugadores, setJugadores] = useState([]);
   const [mensaje, setMensaje] = useState('');
-
+  const rol =  localStorage.getItem('rol');
   // Obtener datos de la reserva
   useEffect(() => {
     fetch(`http://localhost:3001/api/reserva/${id}`)
@@ -60,7 +60,12 @@ function EditarReserva() {
       const data = await res.json();
       if (res.ok) {
         alert('Reserva actualizada exitosamente');
-        navigate('/InicioAdmin');
+        if (rol === 'admin'){
+          navigate('/InicioAdmin');
+        }else{
+          navigate('/InicioUsuario');
+        }
+        
       } else {
         alert(data.message || 'Error al actualizar');
       }

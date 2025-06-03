@@ -190,6 +190,23 @@ function HacerReserva() {
 
 
     try {
+
+      const respEquipamiento = await fetch('http://localhost:3001/api/equipamiento');
+      const equipamientos = await respEquipamiento.json();
+
+      // 2. Sumar el costo del equipamiento seleccionado
+      let costoEquipamiento = 0;
+
+      Object.entries(agregados).forEach(([idStr, cantidad]) => {
+        const id = parseInt(idStr);
+        const item = equipamientos.find(e => e.id === id);
+        if (item) {
+          costoEquipamiento += item.costo * cantidad;
+        }
+      });
+
+      monto += costoEquipamiento;
+
       console.log('🔁 Enviando datos para descontar saldo:', { id_usuario, monto });
       const response = await fetch('http://localhost:3001/api/descontar/saldo', {
         method: 'POST',
