@@ -19,6 +19,7 @@ function HacerReserva() {
   const [agregados, setAgregados] = useState({}); // { id: cantidad }
   const [canchasDisponibles, setCanchasDisponibles] = useState([]);
   const [disponibilidadConsultada, setDisponibilidadConsultada] = useState(false);
+  const [montoTotal, setMontoTotal] = useState(0);
 
 
   useEffect(() => {
@@ -34,6 +35,7 @@ function HacerReserva() {
       .then(data => setEquipamientos(data))
       .catch(error => console.error('Error al obtener equipamiento:', error));
   }, []);
+
 
   const consultarCanchasDisponibles = async () => {
     setDisponibilidadConsultada(false);
@@ -177,15 +179,30 @@ function HacerReserva() {
     }
   };
 
+  const calcularMonto = () => {
+    const costoCancha = parseFloat(canchaSeleccionada?.costo || 0);
+    let costoEquipamiento = 0;
+
+    Object.entries(agregados).forEach(([idStr, cantidad]) => {
+      const id = parseInt(idStr);
+      const item = equipamientos.find(e => e.id === id);
+      if (item) {
+        costoEquipamiento += parseFloat(item.costo) * parseInt(cantidad);
+      }
+    });
+
+    return (costoCancha + costoEquipamiento).toFixed(2);
+  };
+
 
   const descontarSaldo = async () => {
     
     const id_usuario = localStorage.getItem('id');
-    const monto = canchaSeleccionada?.costo;
+    const costoCancha = parseFloat(canchaSeleccionada?.costo || 0);
 
-    if (!id_usuario || !monto) {
-    console.error('Datos inválidos para descontar saldo:', { id_usuario, monto });
-    return;
+    if (!id_usuario) {
+      console.error('ID de usuario inválido');
+      return;
     }
 
 
@@ -194,18 +211,20 @@ function HacerReserva() {
       const respEquipamiento = await fetch('http://localhost:3001/api/equipamiento');
       const equipamientos = await respEquipamiento.json();
 
-      // 2. Sumar el costo del equipamiento seleccionado
       let costoEquipamiento = 0;
 
       Object.entries(agregados).forEach(([idStr, cantidad]) => {
         const id = parseInt(idStr);
         const item = equipamientos.find(e => e.id === id);
         if (item) {
-          costoEquipamiento += item.costo * cantidad;
+          const precio = parseFloat(item.costo);
+          const cant = parseInt(cantidad);
+          costoEquipamiento += precio * cant;
         }
       });
 
-      monto += costoEquipamiento;
+      const monto = parseFloat((costoCancha + costoEquipamiento).toFixed(2));
+
 
       console.log('🔁 Enviando datos para descontar saldo:', { id_usuario, monto });
       const response = await fetch('http://localhost:3001/api/descontar/saldo', {
@@ -224,9 +243,13 @@ function HacerReserva() {
         console.error('Respuesta no OK:', await response.text()); // más detalles
         alert('Error al descontar saldo');
       }
+
+      return monto;
+
     } catch (error) {
       console.error('Error en fetch:', error);
       alert('Error de red al descontar saldo');
+      return null;
     }
   };
   
@@ -237,7 +260,14 @@ function HacerReserva() {
     <div style = {{ position: 'relative', padding: '40px' }}>
       <button
         className="button-decline"
-        onClick={() => navigate('/InicioAdmin')}
+        onClick={() => {
+          const rol = localStorage.getItem('rol');
+          if (rol === 'admin') {
+            navigate('/InicioAdmin');
+          } else {
+            navigate('/InicioUsuario');
+          }
+        }}
         style={{
           position: 'absolute',
           top: '35px',
@@ -423,7 +453,7 @@ function HacerReserva() {
       {pasoActual === 5 && (
         <>
           <h4> Paso 5: Confirmar Pago</h4>
-          <p><strong>Total a Pagar:</strong> {canchaSeleccionada?.costo}</p>
+          <p><strong>Total a Pagar:</strong> ${calcularMonto()}</p>
           <button className="button-accept" onClick={enviarReserva}>Confirmar reserva</button>
         </>
       )}
