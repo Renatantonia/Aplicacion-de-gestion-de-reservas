@@ -125,7 +125,12 @@ function HacerReserva() {
       if (res.ok) {
         
         try {
-          await descontarSaldo();
+          const monto = await descontarSaldo();
+          if(monto === null){
+            console.log("reserva cancelada por saldo insuficiente");
+            navigate('/AnadirSaldo');
+            return;
+          }
           await descontarEquipamiento();
         } catch (error) {
           alert('Reserva realizada, pero hubo un error al descontar el saldo');
@@ -197,7 +202,6 @@ function HacerReserva() {
 
 
   const descontarSaldo = async () => {
-    
     const id_usuario = localStorage.getItem('id');
     const costoCancha = parseFloat(canchaSeleccionada?.costo || 0);
 
@@ -206,9 +210,7 @@ function HacerReserva() {
       return;
     }
 
-
     try {
-
       const respEquipamiento = await fetch('http://localhost:3001/api/equipamiento');
       const equipamientos = await respEquipamiento.json();
 
@@ -225,7 +227,16 @@ function HacerReserva() {
       });
 
       const monto = parseFloat((costoCancha + costoEquipamiento).toFixed(2));
+        // 👉 Paso 1: Consultar saldo actual
+      const respSaldo = await fetch(`http://localhost:3001/api/saldo/${id_usuario}`);
+      const datosSaldo = await respSaldo.json();
+      const saldoActual = parseFloat(datosSaldo.monto_total);
 
+      // 👉 Paso 2: Validar si hay saldo suficiente
+      if (saldoActual < monto) {
+        alert('Tu saldo no es suficiente. Serás redirigido para añadir más saldo.');
+        return null;
+      }
 
       console.log('🔁 Enviando datos para descontar saldo:', { id_usuario, monto });
       const response = await fetch('http://localhost:3001/api/descontar/saldo', {
@@ -236,15 +247,21 @@ function HacerReserva() {
         body: JSON.stringify({ id_usuario, monto })
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Nuevo saldo:', data.nuevoSaldo);
-        alert('Saldo descontado correctamente');
-      } else {
-        console.error('Respuesta no OK:', await response.text()); // más detalles
-        alert('Error al descontar saldo');
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.message === 'Saldo insuficiente.') {
+          alert('Tu saldo no es suficiente. Serás redirigido para añadir más saldo.');
+          navigate('/añadir-saldo'); // Ajusta la ruta si usas otra
+          return null;
+        } else {
+          alert(data.message || 'Error al descontar saldo');
+          return null; 
+        }
       }
 
+      console.log('Nuevo saldo:', data.nuevoSaldo);
+      alert('Saldo descontado correctamente');
       return monto;
 
     } catch (error) {
@@ -253,6 +270,7 @@ function HacerReserva() {
       return null;
     }
   };
+
   
 
 

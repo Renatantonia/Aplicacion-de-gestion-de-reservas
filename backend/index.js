@@ -494,32 +494,43 @@ app.post('/api/descontar/saldo', (req, res) => {
     return res.status(400).json({ message: 'Datos incompletos.' });
   }
 
-  const query = `
-    UPDATE saldo
-    SET monto_total = monto_total - ?
-    WHERE id_usuario = ?
-  `;
-
-  db.query(query, [monto, id_usuario], (err, result) => {
+  // 1. Consultar el saldo actual
+  const getSaldoQuery = 'SELECT monto_total FROM saldo WHERE id_usuario = ?';
+  db.query(getSaldoQuery, [id_usuario], (err, results) => {
     if (err) {
-      console.error('Error al descontar saldo:', err);
-      return res.status(500).json({ message: 'Error al descontar saldo.' });
+      console.error('Error al obtener saldo actual:', err);
+      return res.status(500).json({ message: 'Error al obtener saldo actual.' });
     }
 
-    if (result.affectedRows === 0) {
+    if (results.length === 0) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
-    // Obtener el nuevo saldo
-    db.query('SELECT monto_total FROM saldo WHERE id_usuario = ?', [id_usuario], (err2, result2) => {
+    // 3. Descontar saldo si es suficiente
+    const updateQuery = `
+      UPDATE saldo
+      SET monto_total = monto_total - ?
+      WHERE id_usuario = ?
+    `;
+
+    db.query(updateQuery, [monto, id_usuario], (err2, result) => {
       if (err2) {
-        return res.status(500).json({ message: 'Saldo descontado pero error al consultar nuevo saldo.' });
+        console.error('Error al descontar saldo:', err2);
+        return res.status(500).json({ message: 'Error al descontar saldo.' });
       }
 
-      res.json({ nuevoSaldo: result2[0].monto_total });
+      // 4. Obtener nuevo saldo
+      db.query('SELECT monto_total FROM saldo WHERE id_usuario = ?', [id_usuario], (err3, result2) => {
+        if (err3) {
+          return res.status(500).json({ message: 'Saldo descontado, pero error al consultar nuevo saldo.' });
+        }
+
+        res.json({ message: 'Saldo descontado correctamente.', nuevoSaldo: result2[0].monto_total });
+      });
     });
   });
 });
+
 
 
 
