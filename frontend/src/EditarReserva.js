@@ -80,7 +80,7 @@ function EditarReserva() {
   return (
     <div style={{ padding: '20px' }}>
       <h2>Editar Reserva</h2>
-
+{/* 
       <label>Cancha:</label>
       <select
         value={reserva.id_cancha}
@@ -92,7 +92,7 @@ function EditarReserva() {
           </option>
         ))}
       </select>
-
+*/}
       <br />
       <label>Fecha:</label>
       <input

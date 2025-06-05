@@ -65,38 +65,42 @@ function VerMisReservas() {
         {reservas.length === 0 ? (
           <p>No tienes reservas registradas.</p>
         ) : (
-          reservas.map((reserva) => (
-            <div key={reserva.id_reserva} className="reserva-card" style={{ border: '1px solid black', padding: '10px', marginBottom: '15px' }}>
-              <p><strong>Fecha:</strong> {reserva.fecha}</p>
-              <p><strong>Hora:</strong> {reserva.hora_inicio} - {reserva.hora_fin}</p>
-              <p><strong>Cancha:</strong> {reserva.cancha}</p>
-              <p><strong>Total pagado:</strong> ${reserva.total_pago}</p>
+          reservas.map((reserva) => {
+            const fechaFormateada = new Date(reserva.fecha).toLocaleDateString('es-CL');
 
-              <p><strong>Jugadores:</strong></p>
-              <ul>
-                {reserva.jugadores.map((j, i) => (
-                  <li key={i}>
-                    {j.nombre} {j.apellido} - {j.rut} ({j.edad} años)
-                  </li>
-                ))}
-              </ul>
+            return (
+              <div key={reserva.id_reserva} className="reserva-card" style={{ border: '1px solid black', padding: '10px', marginBottom: '15px' }}>
+                <p><strong>Fecha:</strong> {fechaFormateada}</p>
+                <p><strong>Hora:</strong> {reserva.hora_inicio} - {reserva.hora_fin}</p>
+                <p><strong>Cancha:</strong> {reserva.cancha}</p>
+                <p><strong>Total pagado:</strong> ${reserva.total_pago}</p>
 
-              <div style={{ marginTop: '10px' }}>
-                <button onClick={() => navigate(`/editar-reserva/${reserva.id_reserva}`)} style={{ marginRight: '10px' }}>
-                  Editar
-                </button>
+                <p><strong>Jugadores:</strong></p>
+                <ul>
+                  {reserva.jugadores.map((j, i) => (
+                    <li key={i}>
+                      {j.nombre} {j.apellido} - {j.rut} ({j.edad} años)
+                    </li>
+                  ))}
+                </ul>
 
-                <button
-                  style={{ backgroundColor: 'red', color: 'white' }}
-                  onClick={() => cancelarReserva(reserva.id_reserva, reserva.fecha)}
-                >
-                  Cancelar
-                </button>
+                <div style={{ marginTop: '10px' }}>
+                  <button onClick={() => navigate(`/editar-reserva/${reserva.id_reserva}`)} style={{ marginRight: '10px' }}>
+                    Editar
+                  </button>
+
+                  <button
+                    style={{ backgroundColor: 'red', color: 'white' }}
+                    onClick={() => cancelarReserva(reserva.id_reserva, reserva.fecha)}
+                  >
+                    Cancelar
+                  </button>
+                </div>
               </div>
-            </div>
-
-          ))
+            );
+          })
         )}
+
       </div>
   );
 }

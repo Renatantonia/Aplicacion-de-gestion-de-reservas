@@ -120,6 +120,7 @@ function HacerReserva() {
       });
       
       const data = await res.json();
+      console.log(data); // Aquí deberías ver la respuesta completa
 
       if (res.ok) {
         
@@ -133,6 +134,7 @@ function HacerReserva() {
         navigate('/ReservaExitosa');
         setJugadores([{ nombre: '', apellido: '', rut: '', edad: '' }]);
       } else {
+        console.error('❌ Error del backend:', data); // <--- NUEVO: muestra el contenido del error
         alert(data.message || 'Error al guardar la reserva');
       }
     } catch (error) {

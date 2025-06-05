@@ -105,14 +105,15 @@ app.post('/api/reservas', (req, res) => {
     return res.status(400).json({ message: 'El horario debe estar entre 08:00 y 20:00.' });
   }
 
+{/* 
   // Validar duración entre 90 y 180 minutos
-  const inicio = new Date(`1970-01-01T${hora_inicio}:00`);
-  const fin = new Date(`1970-01-01T${hora_fin}:00`);
-  const duracionMinutos = (fin - inicio) / (1000 * 60);
+  const [hInicio, mInicio] = hora_inicio.split(':').map(Number);
+  const [hFin, mFin] = hora_fin.split(':').map(Number);
 
-  if (duracionMinutos < 90 || duracionMinutos > 180) {
-    return res.status(400).json({ message: 'La duración debe ser entre 90 y 180 minutos.' });
-  }
+  const minutosInicio = hInicio * 60 + mInicio;
+  const minutosFin = hFin * 60 + mFin;
+
+  const duracionMinutos = minutosFin - minutosInicio;
 
   // Validar duración total del usuario ese día
   const queryDuracionDia = `
@@ -125,10 +126,16 @@ app.post('/api/reservas', (req, res) => {
     if (err) return res.status(500).json({ message: 'Error al consultar tiempo diario.' });
 
     const minutosAcumulados = resultadoDuracion[0].minutos_totales || 0;
-    if (minutosAcumulados + duracionMinutos > 180) {
-      return res.status(400).json({ message: 'Superas el límite de 180 minutos diarios de reserva.' });
-    }
 
+    if (minutosAcumulados + duracionMinutos > 180) {
+      return res.status(400).json({
+        message: 'Superas el límite de 180 minutos diarios de reserva.',
+        minutosAcumulados,
+        duracionMinutos,
+        total: minutosAcumulados + duracionMinutos
+    });
+}
+*/}
     // Validar que no haya reserva solapada o consecutiva exacta
     const queryDisponibilidad = `
       SELECT * FROM reservas
@@ -190,7 +197,7 @@ app.post('/api/reservas', (req, res) => {
       });
     });
   });
-});
+
 
 app.get('/api/mis-reservas/:id_usuario', (req, res) => {
   const { id_usuario } = req.params;
@@ -336,18 +343,19 @@ app.put('/api/reservas/:id', (req, res) => {
   // Validar los 7 días de anticipación
   const hoy = new Date();
   const fechaObj = new Date(fecha);
+
   const diff = (fechaObj - hoy) / (1000 * 60 * 60 * 24);
   if (rol !== 'admin' && diff < 7) {
     return res.status(400).json({ message: 'Solo puedes editar con al menos 7 días de anticipación' });
   }
-
+  const fechaFormateada = fechaObj.toISOString().split('T')[0];
   const updateReserva = `
     UPDATE reservas
     SET fecha = ?, hora_inicio = ?, hora_fin = ?, id_cancha = ?
     WHERE id = ?
   `;
 
-  db.query(updateReserva, [fecha, hora_inicio, hora_fin, id_cancha, id], (err) => {
+  db.query(updateReserva, [fechaFormateada, hora_inicio, hora_fin, id_cancha, id], (err) => {
     if (err) {
       console.error('Error actualizando reserva:', err);
       return res.status(500).json({ message: 'Error al actualizar la reserva' });
