@@ -139,6 +139,7 @@ function VerHistorialReservas() {
                             })}</p>
                             <p><strong>Hora:</strong> {reservaSeleccionada.hora_inicio} - {reservaSeleccionada.hora_fin}</p>
                             <p><strong>Total pagado:</strong> ${reservaSeleccionada.total}</p>
+                            {/* 
                             <p><strong>Equipamiento:</strong></p>
                             {reservaSeleccionada.equipamientos.length > 0 ? (
                                 <ul>
@@ -149,6 +150,7 @@ function VerHistorialReservas() {
                             ) : (
                                 <p>Sin equipamiento</p>
                             )}
+                            */}
                             <button onClick={() => setReservaSeleccionada(null)}>Cerrar</button>
                         </div>
                     )}
