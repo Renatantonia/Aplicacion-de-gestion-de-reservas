@@ -17,7 +17,7 @@ function HistorialAdmin() {
       </button>
 
       <button
-        onClick={() => navigate('/VerHistorialPagos')}
+        onClick={() => navigate('/verHistorialGanancias')}
         style={estiloBoton}
       >
         Historial de Pagos

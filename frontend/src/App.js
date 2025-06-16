@@ -18,6 +18,7 @@ import AnadirEquipamiento from './AnadirEquipamiento';
 import ListarEquipamiento from './ListarEquipamiento';
 import './App.css';
 import AnadirSaldo from './AnadirSaldo';
+import VerHistorialGanancias from './verHistorialGanancias';
 
 function Titulo() {
   return (
@@ -64,6 +65,7 @@ function App() {
             <Route path="/mis-reservas" element={<VerMisReservas />} />
             <Route path="/editar-reserva/:id" element={<EditarReserva />} />
             <Route path="/AnadirSaldo" element={<AnadirSaldo/>} /> 
+            <Route path="/VerHistorialGanancias" element={<VerHistorialGanancias/>}/>
           </Routes>
         </Router>
       </div>

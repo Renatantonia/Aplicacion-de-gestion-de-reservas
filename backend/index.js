@@ -37,6 +37,28 @@ app.post('/api/login', (req, res) => {
   });
 });
 
+
+app.get('/api/ganancias', (req, res) => {
+  const query = `
+    SELECT 
+      r.fecha,
+      r.total_pago,
+      u.nombre AS nombre_usuario
+    FROM reservas r
+    JOIN usuarios u ON r.id_usuario = u.id
+    ORDER BY r.fecha DESC;
+  `;
+
+  db.query(query, (err, resultados) => {
+    if (err) {
+      console.error('Error al obtener ganancias:', err);
+      return res.status(500).json({ error: 'Error del servidor' });
+    }
+    res.json(resultados);
+  });
+});
+
+
 app.get('/api/historial-reservas', (req, res) => {
   const query = `
     SELECT 

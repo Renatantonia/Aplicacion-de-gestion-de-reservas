@@ -16,10 +16,10 @@ function VerHistorial (){
             </button>
 
             <button
-                onClick={() => alert('no se ha implementado')}
+                onClick={() => alert('/verHistorialGanancias.js')}
                 style={{ margin: '10px', padding: '50px 60px', fontSize: '16px' }}
             > 
-                Ver Historial de Pagos
+                Ver Historial de Ganancias
             </button>
         </div>
 
