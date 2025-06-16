@@ -3,6 +3,8 @@ import './App.css';
 
 function VerHistorialGanancias() {
     const [ganancias, setGanancias] = useState([]);
+    const idUsuario = parseInt(localStorage.getItem('id'), 10);
+
 
     useEffect(() => {
         fetch('http://localhost:3001/api/ganancias')
@@ -37,7 +39,7 @@ function VerHistorialGanancias() {
                         return (
                             <div key={index} className="fila-datos">
                                 <div className="columna">{fechaFormateada}</div>
-                                <div className="columna">{g.nombre_usuario}</div>
+                                <div className="columna">{idUsuario}</div>
                                 <div className="columna">${g.total_pago}</div>
                             </div>
                         );

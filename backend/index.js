@@ -37,16 +37,14 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-
 app.get('/api/ganancias', (req, res) => {
   const query = `
     SELECT 
-      r.fecha,
-      r.total_pago,
-      u.nombre AS nombre_usuario
-    FROM reservas r
-    JOIN usuarios u ON r.id_usuario = u.id
-    ORDER BY r.fecha DESC;
+      fecha,
+      nombre as nombre_usuario,
+      monto_reserva AS total_pago
+    FROM ganancias
+    ORDER BY fecha DESC;
   `;
 
   db.query(query, (err, resultados) => {
@@ -57,6 +55,7 @@ app.get('/api/ganancias', (req, res) => {
     res.json(resultados);
   });
 });
+
 
 
 app.get('/api/historial-reservas', (req, res) => {
