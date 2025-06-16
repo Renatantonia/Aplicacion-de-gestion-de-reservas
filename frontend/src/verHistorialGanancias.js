@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './App.css'; // Asegúrate de tener estilos para .contenedor-principal, .fila-datos, etc.
+import './App.css'; 
 
 function VerHistorialGanancias() {
     const [ganancias, setGanancias] = useState([]);
