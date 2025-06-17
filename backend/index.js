@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./db');
 const app = express();
+const { enviarCorreoNuevaCancha, enviarCorreoRecordatorio } = require('./email');
 
 app.use(cors());
 app.use(express.json());
@@ -454,6 +455,7 @@ app.get('/api/equipamiento', (req, res) => {
   });
 });
 
+//endpoint para agregar canchas y enviar notificaciones de nueva cancha
 app.post('/api/canchas', (req, res) => {
   const { nombre, tipo, costo, max_jugadores } = req.body;
 
@@ -467,7 +469,28 @@ app.post('/api/canchas', (req, res) => {
       console.error('Error al insertar cancha:', err);
       return res.status(500).json({ message: 'Error al registrar la cancha' });
     }
-    res.status(201).json({ message: 'Cancha registrada exitosamente' });
+
+    const queryCorreos = `SELECT correo FROM usuarios`;
+
+    db.query(queryCorreos, async (err2, resultados) => {
+      if (err2) {
+        console.error('Error al obtener correos:', err2);
+        return res.status(500).json({ message: 'Cancha creada, pero error al enviar correos' });
+      }
+
+      const detalles = `Nombre: ${nombre}\nTipo: ${tipo}\nCosto: $${costo}\nMáx. jugadores: ${max_jugadores}`;
+
+      for (const fila of resultados) {
+        try {
+          await enviarCorreoNuevaCancha(fila.correo, detalles);
+        } catch (errorCorreo) {
+          console.error(`Error al enviar a ${fila.correo}:`, errorCorreo);
+        }
+      }
+
+      res.status(201).json({ message: 'Cancha registrada exitosamente' });
+    })
+    
   });
 });
 
